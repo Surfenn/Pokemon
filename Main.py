@@ -196,7 +196,7 @@ class Type:
                 Type.sprites[i] = pygame.image.load(os.path.join('Types', Type.get_type_path(i)))
             except:
                 pass
-        print(Type.sprites)
+
 class Charmander(Pokemon):
     def __init__(self, index):
         super().__init__("Charmander", Type.FIRE, 5, 39, 52, 43, 65, "charmander", index)
@@ -378,9 +378,10 @@ class Game:
     PLAYER2_CHOOSE_MOVE = 3
     RESOLVE_MOVE1 = 4
     RESOLVE_MOVE2 = 5
-    ROUND_END1 = 6
-    ROUND_END2 = 7
-    GAME_OVER = 8
+    ROUND_END0 = 6
+    ROUND_END1 = 7
+    ROUND_END2 = 8
+    GAME_OVER = 9
     message_queue = []
     
     def __init__(self):
@@ -415,8 +416,9 @@ class Game:
         next_button = Button((0, 500), (1000, 100), '')
         self.buttons[Game.RESOLVE_MOVE1] = [next_button]
         self.buttons[Game.RESOLVE_MOVE2] = [next_button]
-        self.buttons[Game.ROUND_END1] = []
-        self.buttons[Game.ROUND_END2] = []
+        self.buttons[Game.ROUND_END0] = [next_button]
+        self.buttons[Game.ROUND_END1] = [next_button]
+        self.buttons[Game.ROUND_END2] = [next_button]
         self.buttons[Game.GAME_OVER] = []
         for j in range(len(self.players)):
             for i in range(len(self.players[j].pokemons)):
@@ -473,7 +475,9 @@ class Game:
             if event.type == BUTTON_PRESSED:
                 print(self.message_queue)
                 if event.dict['name'] == '':
+                    print('a')
                     if self.message_queue != []:
+                        print('b')
                         self.message_queue.pop(0)  
                 
                 if len(self.message_queue) >= 1:
@@ -507,41 +511,46 @@ class Game:
                     if self.resolve_params.result == Status.SWITCHED:
                         self.next_state = Game.PLAYER2_CHOOSE_POKEMON
                         self.set_state()
-                        self.next_state = Game.ROUND_END1
+                        self.next_state = Game.ROUND_END0
                     else:
-                        self.next_state = Game.ROUND_END1
+                        self.next_state = Game.ROUND_END0
                         self.set_state()
                 
 
-        game_over = False     
-        if self.state == Game.ROUND_END1:
-            self.on_round_end(self.players[0].active_pokemon)
-            self.on_round_end(self.players[1].active_pokemon)
-            if self.players[0].active_pokemon.current_health <= 0:
-                if self.is_game_over(self.players[0]):
-                    game_over = True
-                else:
-                    self.next_state = Game.PLAYER1_CHOOSE_POKEMON
+                game_over = False
+
+                if self.state == Game.ROUND_END0:
+                    # self.on_round_end(self.players[0].active_pokemon)
+                    # self.on_round_end(self.players[1].active_pokemon)
                     self.set_state()
-                    self.next_state = Game.ROUND_END2
-            else:
-                self.next_state = Game.ROUND_END2
-                self.set_state()
-        
-        elif self.state == Game.ROUND_END2:
-            if self.players[1].active_pokemon.current_health <= 0:
-                if self.is_game_over(self.players[1]):
-                    game_over = True
-                else:
-                    self.next_state = Game.PLAYER2_CHOOSE_POKEMON
+
+                elif self.state == Game.ROUND_END1:
+                    print(0)
+                    if self.players[0].active_pokemon.current_health <= 0:
+                        if self.is_game_over(self.players[0]):
+                            game_over = True
+                        else:
+                            self.next_state = Game.PLAYER1_CHOOSE_POKEMON
+                            self.set_state()
+                            self.next_state = Game.ROUND_END2
+                    else:
+                        self.next_state = Game.ROUND_END2
+                        self.set_state()
+                
+                elif self.state == Game.ROUND_END2:
+                    if self.players[1].active_pokemon.current_health <= 0:
+                        if self.is_game_over(self.players[1]):
+                            game_over = True
+                        else:
+                            self.next_state = Game.PLAYER2_CHOOSE_POKEMON
+                            self.set_state()
+                            self.next_state = Game.PLAYER1_CHOOSE_MOVE
+                    else:
+                        self.next_state = Game.PLAYER1_CHOOSE_MOVE
+                        self.set_state()
+                if game_over:
+                    self.next_state = Game.GAME_OVER
                     self.set_state()
-                    self.next_state = Game.PLAYER1_CHOOSE_MOVE
-            else:
-                self.next_state = Game.PLAYER1_CHOOSE_MOVE
-                self.set_state()
-        if game_over:
-            self.next_state = Game.GAME_OVER
-            self.set_state()
 
         clock.tick(60)
 
@@ -557,7 +566,9 @@ class Game:
             button.is_active = True
         if self.state == Game.RESOLVE_MOVE2:
             self.resolve2()
-            #print(self.message_queue)
+        if self.state == Game.ROUND_END0:
+            self.on_round_end(self.players[0].active_pokemon)
+            self.on_round_end(self.players[1].active_pokemon)
         
 
 
@@ -667,6 +678,8 @@ class Game:
         if pokemon.status == Status.BURN:
             pokemon.take_damage(pokemon.max_health // 8)
             Game.set_text(pokemon.name + " has taken burn damage")
+            return False
+        return True
 
     @staticmethod  
     def set_text(text):
