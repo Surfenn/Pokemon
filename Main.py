@@ -164,6 +164,7 @@ class Type:
     ROCK    = 13
     GHOST   = 14
     DRAGON  = 15
+    COUNT = 16
     effectiveness = [
 #    NON  FIR  GRA  WAT  NOR  ELE  ICE  FIG  POI  GRO  FLY  PSY  BUG  ROC  GHO  DRA
     [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],  # NONE
@@ -182,8 +183,20 @@ class Type:
     [1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 0.5, 1.0, 0.5, 2.0, 1.0, 2.0, 1.0, 1.0, 1.0],  # ROCK
     [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0],  # GHOST
     [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0],  # DRAGON
-]
-
+    ]
+    
+    sprites = {}
+    
+    def get_type_path(type):
+        return f"{Type.names[type]}IC_Colo.png"
+    
+    def load_sprites():
+        for i in range(Type.COUNT):
+            try:
+                Type.sprites[i] = pygame.image.load(os.path.join('Types', Type.get_type_path(i)))
+            except:
+                pass
+        print(Type.sprites)
 class Charmander(Pokemon):
     def __init__(self, index):
         super().__init__("Charmander", Type.FIRE, 5, 39, 52, 43, 65, "charmander", index)
@@ -206,7 +219,6 @@ class Bulbasaur(Pokemon):
         self.moves.append(VineWhip())
         self.moves.append(SleepPowder())
 
-
 class Squirtle(Pokemon):
     def __init__(self, index):
         super().__init__("Squirtle", Type.WATER, 5, 44, 48, 65, 43, "squirtle", index)
@@ -219,7 +231,6 @@ class SleepPowder(StatusMove):
 class WillOWisp(StatusMove):
     def __init__(self):
         super().__init__("Will-O-Wisp", Type.FIRE, 0, 15, Status.BURN)
-
 
 class WaterGun(Move):
     def __init__(self):
@@ -237,14 +248,13 @@ class VineWhip(Move):
     def __init__(self):
         super().__init__("Vine Whip", Type.GRASS, 45, 25)
 
-
 class Ember(Move):
     def __init__(self):
         super().__init__("Ember", Type.FIRE, 40, 25)
 
 
 class Button:
-
+    margin = 5
     def __init__(self, position, size, text):
         self.position = position
         self.size = size
@@ -269,7 +279,6 @@ class Button:
             screen.blit(font.render(self.text, True, pygame.Color(0, 0, 0)), self.position)
 
 
-
 class PokemonButton(Button):
 
     separation = 20
@@ -279,10 +288,12 @@ class PokemonButton(Button):
         super().__init__(position, PokemonButton.size, str(index))
         self.pokemon = pokemon
         self.health_bar = HealthBar((position[0] + 125, position[1] + 50), pokemon)
+        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), pokemon.name, pokemon.type)
 
     def draw(self):
         pygame.draw.rect(screen, pygame.Color(200,200,255) if self.is_active else pygame.Color(100, 100, 100), pygame.Rect(self.position, PokemonButton.size))
-        screen.blit(font.render(self.pokemon.name, True, pygame.Color(0, 0, 0)), self.position)
+        
+        self.type_label.draw()
         self.health_bar.draw()
     
     def process(self):
@@ -299,10 +310,17 @@ class MoveButton(Button):
     def __init__(self, position, move, index):
         super().__init__(position, MoveButton.size, str(index))
         self.move = move
+        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), move.name, move.type)
     
     def draw(self):
-        pygame.draw.rect(screen, pygame.Color(0,255,0), pygame.Rect(self.position, MoveButton.size))
-        screen.blit(font.render(self.move.name, True, pygame.Color(0, 0, 0)), self.position)
+        pygame.draw.rect(screen, pygame.Color(200,200,255), pygame.Rect(self.position, MoveButton.size))
+        #screen.blit(font.render(self.move.name, True, pygame.Color(0, 0, 0)), self.position)
+        self.type_label.draw()
+        if self.move.name != 'Switch':
+            label = font.render(str(self.move.current_uses) + '/' + str(self.move.max_uses), True, pygame.Color(0, 0, 0))
+            screen.blit(label, (self.position[0] + 400 - label.get_size()[0] - Button.margin, self.position[1] + 40))
+        if self.move.damage != 0:
+            screen.blit(font.render(str(self.move.damage), True, pygame.Color(0, 0, 0)), (self.position[0] + Button.margin, self.position[1] + 40))
 
 class HealthBar():
     def __init__(self, position, pokemon):
@@ -318,6 +336,19 @@ class HealthBar():
         pygame.draw.rect(screen, pygame.Color(255,0,0), pygame.Rect(self.position, (200, 10)))
         pygame.draw.rect(screen, pygame.Color(0,255,0), pygame.Rect(self.position, (200 * (self.pokemon.current_health / self.pokemon.max_health), 10)))
 
+
+class TypeLabel():
+    def __init__(self, position, text, type):
+        self.text = text
+        self.type = type
+        self.position = position
+
+    def draw(self):
+        surface = font.render(self.text, True, pygame.Color(0, 0, 0))
+        screen.blit(surface, self.position)
+        if self.type in Type.sprites:
+            screen.blit(Type.sprites[self.type], (self.position[0] + surface.get_size()[0] + 20, self.position[1]))
+        
 
 
 pygame.init()
@@ -353,6 +384,7 @@ class Game:
     message_queue = []
     
     def __init__(self):
+        Type.load_sprites()
         self.resolve_params = None
         self.state = Game.PLAYER1_CHOOSE_POKEMON
         self.next_state = None
@@ -543,8 +575,10 @@ class Game:
             if player.active_pokemon != None:
                 sprite = player.active_pokemon.sprite
                 sprite = pygame.transform.scale_by(sprite, 5)
+                #name = font.render(player.active_pokemon.name, True, pygame.Color(0, 0, 0))
                 screen.blit(sprite, (0 + 400 * player.index, 150 - 250 * player.index)) # Draw Sprite
-                screen.blit(font.render(player.active_pokemon.name, True, pygame.Color(0, 0, 0)), (600 - 500 * player.index, 400 - 300 * player.index))
+                #screen.blit(name, (600 - 500 * player.index, 400 - 300 * player.index))
+                TypeLabel((600 - 500 * player.index, 400 - 300 * player.index), player.active_pokemon.name, player.active_pokemon.type).draw()
                 # screen.blit(font.render(str(player.active_pokemon.current_health) + "/" + str(player.active_pokemon.max_health), True, pygame.Color(0, 0, 0)), (600 - 500 * player.index, 440 - 300 * player.index))
                 # pygame.draw.rect(screen, pygame.Color(255,0,0), pygame.Rect((725 - 500 * player.index, 450 - 300 * player.index), (200, 10)))
                 # pygame.draw.rect(screen, pygame.Color(0,255,0), pygame.Rect((725 - 500 * player.index, 450 - 300 * player.index), (200 * (player.active_pokemon.current_health / player.active_pokemon.max_health), 10)))
