@@ -469,7 +469,10 @@ class Game:
         
         for button in self.buttons[self.state]:
             button.process()
-
+        
+        # if self.has_next_button(self.state) and self.message_queue == []:
+        #     pygame.event.post(pygame.event.Event(BUTTON_PRESSED, {"name": ''}))
+        
         # Checks if Button was pressed
         for event in pygame.event.get():
             if event.type == BUTTON_PRESSED:
@@ -569,6 +572,11 @@ class Game:
         if self.state == Game.ROUND_END0:
             self.on_round_end(self.players[0].active_pokemon)
             self.on_round_end(self.players[1].active_pokemon)
+        # if self.has_next_button(self.state) and self.message_queue == []:
+        #     if self.state == Game.ROUND_END2:
+        #         self.next_state = Game.PLAYER1_CHOOSE_MOVE
+        #     self.set_state()
+        
         
 
 
@@ -667,7 +675,7 @@ class Game:
             self.resolve_params.result = result
         else:
             self.resolve_params.result = Status.FAINTED
-            
+
     def is_game_over(self, player):
         for i in range(len(player.pokemons)):
             if player.pokemons[i].current_health != 0:
@@ -680,6 +688,12 @@ class Game:
             Game.set_text(pokemon.name + " has taken burn damage")
             return False
         return True
+
+    def has_next_button(self, state):
+        for button in self.buttons[state]:
+            if button.text == '':
+                return True
+        return False
 
     @staticmethod  
     def set_text(text):
