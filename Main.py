@@ -101,7 +101,6 @@ class Move:
             stab = 1
         first_damage = int((((((2 * user.level)//5) + 2) * self.damage * (user.attack // user.defense)) // 50))
         total_damage = int(first_damage * stab * (Type.effectiveness[self.type][target.type] * Type.effectiveness[self.type][target.type2]))
-        #total_damage = int((self.damage * user.attack * Type.effectiveness[self.type][target.type]/(target.defense + 1)))
         if user.status == Status.BURN:
             total_damage //= 2
         target.take_damage(total_damage)
@@ -314,7 +313,6 @@ class MoveButton(Button):
     
     def draw(self):
         pygame.draw.rect(screen, pygame.Color(200,200,255), pygame.Rect(self.position, MoveButton.size))
-        #screen.blit(font.render(self.move.name, True, pygame.Color(0, 0, 0)), self.position)
         self.type_label.draw()
         if self.move.name != 'Switch':
             label = font.render(str(self.move.current_uses) + '/' + str(self.move.max_uses), True, pygame.Color(0, 0, 0))
@@ -355,8 +353,6 @@ pygame.init()
 BUTTON_PRESSED = pygame.event.custom_type()
 screen = pygame.display.set_mode((1000, 1000))
 clock = pygame.time.Clock()
-# bulbasaur = pygame.image.load(os.path.join('Images', 'bulbasaur.png'))
-# bulbasaur = bulbasaur.convert_alpha()
 font = pygame.font.SysFont("Calibri", 30)
 
 
@@ -428,33 +424,8 @@ class Game:
                     button.is_active = True
                 else:
                     self.buttons[Game.PLAYER2_CHOOSE_POKEMON].append(button)       
-        
-    # def start(self):
-    #     self.choose_pokemon(self.players[0])
-    #     self.choose_pokemon(self.players[1])
-    #     while True:
-    #         self.display_battle()
-    #         move1 = self.choose_move(self.players[0])
-    #         move2 = self.choose_move(self.players[1])
-    #         self.resolve1(self.players[0], self.players[1], move1, move2)
-    #         self.on_round_end(self.players[0].active_pokemon)
-    #         self.on_round_end(self.players[1].active_pokemon)
-    #         if self.is_game_over(self.players[0]) or self.is_game_over(self.players[1]):
-    #             break
-    #         if self.players[0].active_pokemon.current_health == 0:
-    #             self.choose_pokemon(self.players[0])
-    #         if self.players[1].active_pokemon.current_health == 0:
-    #             self.choose_pokemon(self.players[1])
-    #     self.display_battle()
-    #     Game.set_text("Game Over")
-    #     if self.is_game_over(self.players[0]) and self.is_game_over(self.players[1]):
-    #         Game.set_text("Draw")
-    #     elif self.is_game_over(self.players[0]):
-    #         Game.set_text(self.players[1].name + " Win")
-    #     else:
-    #         Game.set_text(self.players[0].name + " Win")
 
-    def start2(self):
+    def start(self):
         while self.running:
             self.draw()
             self.process()
@@ -462,46 +433,45 @@ class Game:
     def process(self):
         for event in pygame.event.get(pygame.QUIT):
             self.running = False
-        # Process Buttons
-        # for list in self.buttons.values(): 
-        #     for button in list:
-        #         button.process()
-        
+
         for button in self.buttons[self.state]:
             button.process()
-
+        
+        if self.has_next_button(self.state) and self.message_queue == []:
+            pygame.event.post(pygame.event.Event(BUTTON_PRESSED, {"name": ''}))
+        
         # Checks if Button was pressed
         for event in pygame.event.get():
             if event.type == BUTTON_PRESSED:
-                print(self.message_queue)
                 if event.dict['name'] == '':
-                    print('a')
                     if self.message_queue != []:
-                        print('b')
                         self.message_queue.pop(0)  
                 
                 if len(self.message_queue) >= 1:
                     continue
                 if self.state == Game.PLAYER1_CHOOSE_POKEMON:
                     self.choose_pokemon(self.players[0], int(event.dict['name']))
+                    
+
                     self.set_state()
-                    #self.set_state(Game.PLAYER2_CHOOSE_POKEMON)
                 elif self.state == Game.PLAYER2_CHOOSE_POKEMON:
                     self.choose_pokemon(self.players[1], int(event.dict['name']))
+                    
                     self.set_state()
-                    #self.set_state(Game.PLAYER1_CHOOSE_MOVE)
                 elif self.state == Game.PLAYER1_CHOOSE_MOVE:
                     self.player1_move = self.choose_move(self.players[0], int(event.dict['name']))
                     self.set_state()
-                    #self.set_state(Game.PLAYER2_CHOOSE_MOVE)
                 elif self.state == Game.PLAYER2_CHOOSE_MOVE:
                     player2_move = self.choose_move(self.players[1], int(event.dict['name']))
                     self.resolve1(self.players[0], self.players[1], self.player1_move, player2_move)
                     self.set_state()
-                    #self.set_state(Game.PLAYER1_CHOOSE_MOVE)
+
                 elif self.state == Game.RESOLVE_MOVE1:
                     if self.resolve_params.result == Status.SWITCHED:
-                        self.next_state = Game.PLAYER1_CHOOSE_POKEMON
+                        if self.resolve_params.player1.index == 0:
+                            self.next_state = Game.PLAYER1_CHOOSE_POKEMON
+                        else:
+                            self.next_state = Game.PLAYER2_CHOOSE_POKEMON
                         self.set_state()
                         self.next_state = Game.RESOLVE_MOVE2
                     else:
@@ -509,23 +479,24 @@ class Game:
                         
                 elif self.state == Game.RESOLVE_MOVE2:
                     if self.resolve_params.result == Status.SWITCHED:
-                        self.next_state = Game.PLAYER2_CHOOSE_POKEMON
+                        if self.resolve_params.player1.index == 0:
+                            self.next_state = Game.PLAYER1_CHOOSE_POKEMON
+                        else:
+                            self.next_state = Game.PLAYER2_CHOOSE_POKEMON
                         self.set_state()
                         self.next_state = Game.ROUND_END0
                     else:
                         self.next_state = Game.ROUND_END0
                         self.set_state()
+                    self.resolve_params = None
                 
 
                 game_over = False
 
                 if self.state == Game.ROUND_END0:
-                    # self.on_round_end(self.players[0].active_pokemon)
-                    # self.on_round_end(self.players[1].active_pokemon)
                     self.set_state()
 
                 elif self.state == Game.ROUND_END1:
-                    print(0)
                     if self.players[0].active_pokemon.current_health <= 0:
                         if self.is_game_over(self.players[0]):
                             game_over = True
@@ -568,17 +539,13 @@ class Game:
             self.resolve2()
         if self.state == Game.ROUND_END0:
             self.on_round_end(self.players[0].active_pokemon)
-            self.on_round_end(self.players[1].active_pokemon)
-        
+            self.on_round_end(self.players[1].active_pokemon)  
 
 
     def draw(self):
         pos2 = (50, 525)
         # Drawing 
         screen.fill(pygame.Color(255,255,255)) # Clear Screen
-        # for list in self.buttons.values(): # Draws Buttons
-        #     for button in list: 
-        #         button.draw()
         for button in self.buttons[self.state]:
             button.draw()
 
@@ -586,13 +553,8 @@ class Game:
             if player.active_pokemon != None:
                 sprite = player.active_pokemon.sprite
                 sprite = pygame.transform.scale_by(sprite, 5)
-                #name = font.render(player.active_pokemon.name, True, pygame.Color(0, 0, 0))
                 screen.blit(sprite, (0 + 400 * player.index, 150 - 250 * player.index)) # Draw Sprite
-                #screen.blit(name, (600 - 500 * player.index, 400 - 300 * player.index))
                 TypeLabel((600 - 500 * player.index, 400 - 300 * player.index), player.active_pokemon.name, player.active_pokemon.type).draw()
-                # screen.blit(font.render(str(player.active_pokemon.current_health) + "/" + str(player.active_pokemon.max_health), True, pygame.Color(0, 0, 0)), (600 - 500 * player.index, 440 - 300 * player.index))
-                # pygame.draw.rect(screen, pygame.Color(255,0,0), pygame.Rect((725 - 500 * player.index, 450 - 300 * player.index), (200, 10)))
-                # pygame.draw.rect(screen, pygame.Color(0,255,0), pygame.Rect((725 - 500 * player.index, 450 - 300 * player.index), (200 * (player.active_pokemon.current_health / player.active_pokemon.max_health), 10)))
                 self.health_bars[player.index].draw()
 
         if self.state == Game.PLAYER1_CHOOSE_POKEMON:
@@ -651,13 +613,6 @@ class Game:
         result = move1.use(p1, p2)
         self.resolve_params = ResolveParams(player1, player2, move1, move2, result)
 
-        # if result == Status.SWITCHED:
-        #     self.choose_pokemon(player1)
-
-        # if p2.current_health > 0:
-        #     result = move2.use(p2, player1.active_pokemon)
-        #     if result == Status.SWITCHED:
-        #         self.choose_pokemon(player2)
 
     def resolve2(self):
         p1 = self.resolve_params.player1.active_pokemon
@@ -667,7 +622,8 @@ class Game:
             self.resolve_params.result = result
         else:
             self.resolve_params.result = Status.FAINTED
-            
+        
+
     def is_game_over(self, player):
         for i in range(len(player.pokemons)):
             if player.pokemons[i].current_health != 0:
@@ -681,16 +637,15 @@ class Game:
             return False
         return True
 
+    def has_next_button(self, state):
+        for button in self.buttons[state]:
+            if button.text == '':
+                return True
+        return False
+
     @staticmethod  
     def set_text(text):
         Game.message_queue.append(text)  
 
-# def start():
-#     running = True
-#     while running:
-        
-        
-#     pygame.quit()
-
 g = Game()
-g.start2()
+g.start()
