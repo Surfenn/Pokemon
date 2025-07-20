@@ -109,12 +109,24 @@ class Move:
 
 
 class Status:
-    names = ["","Switch", "Burn", "Sleep", "Fainted"]
+    names = ["","Switch", "Burned", "Asleep", "Fainted"]
     NONE = 0
     SWITCHED = 1
     BURN = 2
     SLEEP = 3
     FAINTED = 4
+    COUNT = 5
+    sprites = {}
+    
+    def get_status_path(status):
+        return f"{Status.names[status]}IC_BW.png"
+    
+    def load_sprites():
+        for i in range(Status.COUNT):
+            try:
+                Status.sprites[i] = pygame.image.load(os.path.join('Status', Status.get_status_path(i)))
+            except:
+                pass
 
 
 class StatusMove(Move):
@@ -287,7 +299,7 @@ class PokemonButton(Button):
         super().__init__(position, PokemonButton.size, str(index))
         self.pokemon = pokemon
         self.health_bar = HealthBar((position[0] + 125, position[1] + 50), pokemon)
-        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), pokemon.name, pokemon.type)
+        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), pokemon.name, pokemon.type, pokemon.status)
 
     def draw(self):
         pygame.draw.rect(screen, pygame.Color(200,200,255) if self.is_active else pygame.Color(100, 100, 100), pygame.Rect(self.position, PokemonButton.size))
@@ -309,7 +321,7 @@ class MoveButton(Button):
     def __init__(self, position, move, index):
         super().__init__(position, MoveButton.size, str(index))
         self.move = move
-        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), move.name, move.type)
+        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), move.name, move.type, Status.NONE)
     
     def draw(self):
         pygame.draw.rect(screen, pygame.Color(200,200,255), pygame.Rect(self.position, MoveButton.size))
@@ -336,16 +348,22 @@ class HealthBar():
 
 
 class TypeLabel():
-    def __init__(self, position, text, type):
+    def __init__(self, position, text, type, status):
         self.text = text
         self.type = type
         self.position = position
+        self.status = status
 
     def draw(self):
         surface = font.render(self.text, True, pygame.Color(0, 0, 0))
         screen.blit(surface, self.position)
         if self.type in Type.sprites:
             screen.blit(Type.sprites[self.type], (self.position[0] + surface.get_size()[0] + 20, self.position[1]))
+        if self.status in Status.sprites:
+            sprite = pygame.transform.scale_by(Status.sprites[self.status], 3)
+            screen.blit(sprite, (self.position[0] + surface.get_size()[0] + 125, self.position[1]))
+
+
         
 
 
@@ -382,6 +400,7 @@ class Game:
     
     def __init__(self):
         Type.load_sprites()
+        Status.load_sprites()
         self.resolve_params = None
         self.state = Game.PLAYER1_CHOOSE_POKEMON
         self.next_state = None
@@ -479,7 +498,7 @@ class Game:
                         
                 elif self.state == Game.RESOLVE_MOVE2:
                     if self.resolve_params.result == Status.SWITCHED:
-                        if self.resolve_params.player1.index == 0:
+                        if self.resolve_params.player2.index == 0:
                             self.next_state = Game.PLAYER1_CHOOSE_POKEMON
                         else:
                             self.next_state = Game.PLAYER2_CHOOSE_POKEMON
@@ -554,7 +573,7 @@ class Game:
                 sprite = player.active_pokemon.sprite
                 sprite = pygame.transform.scale_by(sprite, 5)
                 screen.blit(sprite, (0 + 400 * player.index, 150 - 250 * player.index)) # Draw Sprite
-                TypeLabel((600 - 500 * player.index, 400 - 300 * player.index), player.active_pokemon.name, player.active_pokemon.type).draw()
+                TypeLabel((600 - 500 * player.index, 400 - 300 * player.index), player.active_pokemon.name, player.active_pokemon.type, player.active_pokemon.status).draw()
                 self.health_bars[player.index].draw()
 
         if self.state == Game.PLAYER1_CHOOSE_POKEMON:
