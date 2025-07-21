@@ -87,11 +87,38 @@ class Move:
         self.max_uses = max_uses
         self.current_uses = max_uses
         self.priority = 0
+        self.accuracy = 100
     
     def __str__(self):
         return self.name + " (" + str(Type.names[self.type]) + ") " + str(self.current_uses) + "/" + str(self.max_uses)
     
     def use(self, user, target):
+        if(user.status == Status.SLEEP or user.status == Status.FROZEN):
+            return self.check_status(user)
+        elif(user.status == Status.PARALYSIS):
+            if random.randint(1, 100) < 25:
+                Game.set_text(user.name + " is Paralyzed")
+                return Status.PARALYSIS
+        
+        if random.randint(1, 100) <= self.accuracy:   
+            Game.set_text(user.name + " used " + self.name + " on " + target.name)
+            if self.type == user.type:
+                stab = 1.5
+            else:
+                stab = 1
+            first_damage = int((((((2 * user.level)//5) + 2) * self.damage * (user.attack // user.defense)) // 50))
+            total_damage = int(first_damage * stab * (Type.effectiveness[self.type][target.type] * Type.effectiveness[self.type][target.type2]))
+            if user.status == Status.BURN:
+                total_damage //= 2
+            target.take_damage(total_damage)
+            self.current_uses -= 1
+            return Status.NONE
+        else:
+            Game.set_text(user.name + " Missed")
+            return Status.NONE
+
+
+    def check_status(self, user):
         if(user.status == Status.SLEEP):
             if(user.sleep_count == 0):
                 user.set_status(Status.NONE)
@@ -108,27 +135,12 @@ class Move:
                 Game.set_text(user.name + " is Frozen")
                 user.frozen_count -= 1
                 return Status.FROZEN
-        elif(user.status == Status.PARALYSIS):
-            if random.randint(1, 100) < 25:
-                Game.set_text(user.name + " is Paralyzed")
-                return Status.PARALYSIS
             
-        Game.set_text(user.name + " used " + self.name + " on " + target.name)
-        if self.type == user.type:
-            stab = 1.5
-        else:
-            stab = 1
-        first_damage = int((((((2 * user.level)//5) + 2) * self.damage * (user.attack // user.defense)) // 50))
-        total_damage = int(first_damage * stab * (Type.effectiveness[self.type][target.type] * Type.effectiveness[self.type][target.type2]))
-        if user.status == Status.BURN:
-            total_damage //= 2
-        target.take_damage(total_damage)
-        self.current_uses -= 1
-        return Status.NONE
+
 
 
 class Status:
-    names = ["","Switch", "Burned", "Asleep", "Fainted", "Frozen", "Paralysis", "Poisoned", "PoisonedBad"]
+    names = ["","Switch", "Burned", "Asleep", "Fainted", "Frozen", "Paralysis", "Poisoned", "PoisonedBad", "Confused"]
     NONE = 0
     SWITCHED = 1
     BURN = 2
@@ -138,7 +150,8 @@ class Status:
     PARALYSIS = 6
     POISON = 7
     POISONEDBAD = 8
-    COUNT = 9
+    CONFUSION = 9
+    COUNT = 10
     sprites = {}
     
     def get_status_path(status):
@@ -154,9 +167,10 @@ class Status:
 
 class StatusMove(Move):
 
-    def __init__(self, name, type, damage, max_uses, status):
+    def __init__(self, name, type, damage, accuracy, max_uses, status):
         super().__init__(name, type, damage, max_uses)
         self.status = status
+        self.accuracy = accuracy
 
     def use(self, user, target):
         result = super().use(user, target)
@@ -165,6 +179,38 @@ class StatusMove(Move):
         target.set_status(self.status)
         return result
 
+class AbsorptionMove(Move):
+    def __init__(self, name, type, damage, accuracy, max_uses):
+        super().__init__(name, type, damage, max_uses)
+        self.accuracy = accuracy
+
+    def use(self, user, target):
+        if(user.status == Status.SLEEP or user.status == Status.FROZEN):
+            return self.check_status(user)
+        elif(user.status == Status.PARALYSIS):
+            if random.randint(1, 100) < 25:
+                Game.set_text(user.name + " is Paralyzed")
+                return Status.PARALYSIS
+        
+        if random.randint(1, 100) <= self.accuracy:   
+            Game.set_text(user.name + " used " + self.name + " on " + target.name)
+            if self.type == user.type:
+                stab = 1.5
+            else:
+                stab = 1
+            first_damage = int((((((2 * user.level)//5) + 2) * self.damage * (user.attack // user.defense)) // 50))
+            total_damage = int(first_damage * stab * (Type.effectiveness[self.type][target.type] * Type.effectiveness[self.type][target.type2]))
+            if user.status == Status.BURN:
+                total_damage //= 2
+            target.take_damage(total_damage)
+            self.current_uses -= 1
+            user.current_health += total_damage // 2
+            if user.current_health > user.max_health:
+                user.current_health = user.max_health
+            return Status.NONE
+        else:
+            Game.set_text(user.name + " Missed")
+        
 
 class Switch(Move):
 
@@ -231,12 +277,15 @@ class Type:
             except:
                 pass
 
+
+#All Gen 1 Pokemon 
+
 class Bulbasaur(Pokemon):
     def __init__(self, index):
         super().__init__("Bulbasaur", Type.GRASS, 5, 45, 49, 49, 45, "bulbasaur", index)
         self.type2 = Type.POISON
         self.moves.append(VineWhip())
-        self.moves.append(SleepPowder())
+        
 
 class Ivysaur(Pokemon):
     def __init__(self, index):
@@ -251,7 +300,7 @@ class Venusaur(Pokemon):
 class Charmander(Pokemon):
     def __init__(self, index):
         super().__init__("Charmander", Type.FIRE, 5, 39, 52, 43, 65, "charmander", index)
-        self.moves.append(Ember())
+        self.moves.append(FireBlast())
         self.moves.append(WillOWisp())
 
 class Charmeleon(Pokemon):
@@ -363,7 +412,7 @@ class Sandslash(Pokemon):
 
 class NidoranF(Pokemon):
     def __init__(self, index):
-        super().__init__("Nidoran♀", Type.POISON, 5, 55, 47, 52, 41, "nidoranf", index)
+        super().__init__("Nidoran♀", Type.POISON, 5, 55, 47, 52, 41, "nidoran-f", index)
 
 class Nidorina(Pokemon):
     def __init__(self, index):
@@ -376,7 +425,7 @@ class Nidoqueen(Pokemon):
 
 class NidoranM(Pokemon):
     def __init__(self, index):
-        super().__init__("Nidoran♂", Type.POISON, 5, 46, 57, 40, 50, "nidoranm", index)
+        super().__init__("Nidoran♂", Type.POISON, 5, 46, 57, 40, 50, "nidoran-m", index)
 
 class Nidorino(Pokemon):
     def __init__(self, index):
@@ -845,26 +894,22 @@ class Mewtwo(Pokemon):
 class Mew(Pokemon):
     def __init__(self, index):
         super().__init__("Mew", Type.PSYCHIC, 70, 100, 100, 100, 100, "mew", index)
-        self.moves.append(ThunderWave())
-        self.moves.append(TestMove())
-        self.moves.append(Toxic())
-        self.moves.append(PoisonGas())
+        self.moves.append(Rest())
+        self.moves.append(FireBlast())
+        self.moves.append(Absorb())
 
 
-class SleepPowder(StatusMove):
-    def __init__(self):
-        super().__init__("Sleep Powder", Type.GRASS, 0, 15, Status.SLEEP)
-
+######################################################################################################################################################################
 
 
 #Fire Moves
 class WillOWisp(StatusMove):
     def __init__(self):
-        super().__init__("Will-O-Wisp", Type.FIRE, 0, 15, Status.BURN)
+        super().__init__("Will-O-Wisp", Type.FIRE, 0, 100, 15, Status.BURN)
 
 class Ember(StatusMove):
     def __init__(self):
-        super().__init__("Ember", Type.FIRE, 40, 25, Status.NONE)
+        super().__init__("Ember", Type.FIRE, 40, 100, 25, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -876,7 +921,7 @@ class Ember(StatusMove):
     
 class FireBlast(StatusMove):
     def __init__(self):
-        super().__init__("Fire Blast", Type.FIRE, 110, 5, Status.NONE)
+        super().__init__("Fire Blast", Type.FIRE, 110, 85, 5, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -888,12 +933,12 @@ class FireBlast(StatusMove):
 
 class FireSpin(StatusMove):#TODO should cause burning for 4-5 turns
     def __init__(self):
-        super().__init__("Fire Spin", Type.FIRE, 35, 15, Status.NONE)
+        super().__init__("Fire Spin", Type.FIRE, 35, 85, 15, Status.NONE)
 
 
 class FirePunch(StatusMove):
     def __init__(self):
-        super().__init__("Fire Punch", Type.FIRE, 75, 15, Status.NONE)
+        super().__init__("Fire Punch", Type.FIRE, 75, 100, 15, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -905,7 +950,7 @@ class FirePunch(StatusMove):
 
 class Flamethrower(StatusMove):
     def __init__(self):
-        super().__init__("Flamethrower", Type.FIRE, 90, 15, Status.NONE)
+        super().__init__("Flamethrower", Type.FIRE, 90, 100, 15, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -914,17 +959,16 @@ class Flamethrower(StatusMove):
         if random.randint(1, 100) <= 10:
             target.set_status(Status.BURN)
         return result
-
-################################################################################################
+######################################################################################################################################################################
 
 #Electric Moves
 class ThunderWave(StatusMove):
     def __init__(self):
-        super().__init__("ThunderWave", Type.ELECTRIC, 0, 20, Status.PARALYSIS)
+        super().__init__("ThunderWave", Type.ELECTRIC, 0, 90, 20, Status.PARALYSIS)
 
 class Thunderbolt(StatusMove):
     def __init__(self):
-        super().__init__("Thunderbolt", Type.ELECTRIC, 90, 15, Status.NONE)
+        super().__init__("Thunderbolt", Type.ELECTRIC, 90, 100, 15, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -936,7 +980,7 @@ class Thunderbolt(StatusMove):
 
 class ThunderShock(StatusMove):
     def __init__(self):
-        super().__init__("Thunder Shock", Type.ELECTRIC, 40, 30, Status.NONE)
+        super().__init__("Thunder Shock", Type.ELECTRIC, 40, 100, 30, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -948,7 +992,7 @@ class ThunderShock(StatusMove):
     
 class ThunderPunch(StatusMove):
     def __init__(self):
-        super().__init__("Thunder Punch", Type.ELECTRIC, 75, 15, Status.NONE)
+        super().__init__("Thunder Punch", Type.ELECTRIC, 75, 100, 15, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -960,7 +1004,7 @@ class ThunderPunch(StatusMove):
 
 class Thunder(StatusMove):
     def __init__(self):
-        super().__init__("Thunder Shock", Type.ELECTRIC, 110, 10, Status.NONE)
+        super().__init__("Thunder Shock", Type.ELECTRIC, 110, 70, 10, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -969,7 +1013,7 @@ class Thunder(StatusMove):
         if random.randint(1, 100) <= 30:
             target.set_status(Status.PARALYSIS)
         return result
-################################################################################################
+######################################################################################################################################################################
 
 #poison Moves
 class Acid(Move):
@@ -978,19 +1022,19 @@ class Acid(Move):
 
 class Toxic(StatusMove):
     def __init__(self):
-        super().__init__("Toxic", Type.POISON, 0, 10, Status.POISONEDBAD)
+        super().__init__("Toxic", Type.POISON, 0, 90, 10, Status.POISONEDBAD)
 
 class PoisonGas(StatusMove):
     def __init__(self):
-        super().__init__("Poison Gas", Type.POISON, 0, 40, Status.POISON)
+        super().__init__("Poison Gas", Type.POISON, 0, 90, 40, Status.POISON)
 
 class PoisonPowder(StatusMove):
     def __init__(self):
-        super().__init__("Poison Powder", Type.POISON, 0, 35, Status.POISON)
+        super().__init__("Poison Powder", Type.POISON, 0, 75, 35, Status.POISON)
 
 class Smog(StatusMove):
     def __init__(self):
-        super().__init__("Smog", Type.POISON, 30, 20, Status.NONE)
+        super().__init__("Smog", Type.POISON, 30, 70, 20, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -1002,7 +1046,7 @@ class Smog(StatusMove):
 
 class Sludge(StatusMove):
     def __init__(self):
-        super().__init__("Sludge", Type.POISON, 65, 20, Status.NONE)
+        super().__init__("Sludge", Type.POISON, 65, 100, 20, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -1014,7 +1058,7 @@ class Sludge(StatusMove):
 
 class PosionSting(StatusMove):
     def __init__(self):
-        super().__init__("Posion Sting", Type.POISON, 15, 35, Status.NONE)
+        super().__init__("Posion Sting", Type.POISON, 15, 100, 35, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -1024,18 +1068,8 @@ class PosionSting(StatusMove):
             target.set_status(Status.POISON)
         return result
 
-class PowderSnow(StatusMove):
-    def __init__(self):
-        super().__init__("Powder Snow", Type.ICE, 40, 25, Status.NONE)
-    
-    def use(self, user, target):
-        result = super().use(user, target)
-        if result != Status.NONE:
-            return result
-        if random.randint(1, 100) <= 10:
-            target.set_status(Status.FROZEN)
-        return result
-################################################################################################
+
+######################################################################################################################################################################
 
 #Water Moves
 class WaterGun(Move):
@@ -1058,9 +1092,9 @@ class Crabhammer(Move):
     def __init__(self):
         super().__init__("Crabhammer", Type.WATER, 100, 10)
 
-class Clamp(StatusMove):#TODO should cause damgage for 4-5 turns
+class Clamp(StatusMove):#TODO should cause damage for 4-5 turns
     def __init__(self):
-        super().__init__("Clamp", Type.Water, 35, 15, Status.NONE)
+        super().__init__("Clamp", Type.Water, 35, 85, 15, Status.NONE)
 
 class Bubble(Move):
     def __init__(self):
@@ -1069,7 +1103,7 @@ class Bubble(Move):
 class BubbleBeam(Move):
     def __init__(self):
         super().__init__("Bubble Beam", Type.WATER, 65, 20)
-################################################################################################
+######################################################################################################################################################################
 
 #Psychic Moves
 class Psychic(Move):
@@ -1077,23 +1111,293 @@ class Psychic(Move):
         super().__init__("Psychic", Type.PSYCHIC, 90, 10)
 
 class Confusion(StatusMove):
-    pass
-
-
-
-class TestMove(Move):
     def __init__(self):
-        super().__init__("Fake Move", Type.NONE, 0, 100)
+        super().__init__("Confusion", Type.PSYCHIC, 50, 100, 25, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.CONFUSION)
+        return result
 
-
-
-class RollingKick(Move):
+class Hypnosis(StatusMove):
     def __init__(self):
-        super().__init__("Rolling Kick", Type.FIGHTING, 60, 15)
+        super().__init__("Hypnosis", Type.PSYCHIC, 0, 60, 20, Status.SLEEP)
+
+class Psybeam(StatusMove):
+    def __init__(self):
+        super().__init__("Psybeam", Type.PSYCHIC, 65, 100, 20, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.CONFUSION)
+        return result
+
+class Rest(StatusMove):
+    def __init__(self):
+        super().__init__("Rest", Type.PSYCHIC, 0, 100, 5, Status.SLEEP)
+    
+    def use(self, user, target):
+        user.current_health = user.max_health
+        user.set_status(Status.SLEEP)
+######################################################################################################################################################################      
+
+#Ice Moves
+class PowderSnow(StatusMove):
+    def __init__(self):
+        super().__init__("Powder Snow", Type.ICE, 40, 25, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.FROZEN)
+        return result
+    
+class Blizzard(StatusMove):
+    def __init__(self):
+        super().__init__("Blizzard", Type.ICE, 100, 70, 5, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.FROZEN)
+        return result
+
+class Haze(StatusMove):
+    def __init__(self):
+        super().__init__("Haze", Type.ICE, 0, 100, 30, Status.NONE)
+    
+    def use(self, user, target):
+        user.set_status(Status.NONE)
+
+class IceBeam(StatusMove):
+    def __init__(self):
+        super().__init__("Ice Beam", Type.ICE, 90, 100, 10, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.FROZEN)
+        return result
+
+class IcePunch(StatusMove):
+    def __init__(self):
+        super().__init__("Ice Punch", Type.ICE, 75, 100, 10, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.FROZEN)
+        return result
+######################################################################################################################################################################
+
+#Ground Moves
+class Earthquake(Move):
+    def __init__(self):
+        super().__init__("Earthquake", Type.GROUND, 100, 10)
+
+class Fissure(StatusMove):
+    def __init__(self):
+        super().__init__("Fissure", Type.Ground, 1000000000, 30, 15, Status.NONE)
+
+class BoneClub(StatusMove):
+    def __init__(self):
+        super().__init__("Bone Club", Type.Ground, 65, 85, 20, Status.NONE)
+
+class Bonemerang(StatusMove): #TODO Hits Twice
+    def __init__(self):
+        super().__init__("Bonemerang", Type.Ground, 50, 90, 10, Status.NONE)
+
+class Dig(StatusMove): #TODO two turn attack
+    def __init__(self):
+        super().__init__("Dig", Type.Ground, 80, 100, 10, Status.NONE)
+######################################################################################################################################################################
+
+#Flying moves
+class DrillPeck(Move):
+    def __init__(self):
+        super().__init__("Drill Peck", Type.FLYING, 80, 20)
+
+class Fly(StatusMove): #TODO two turn attack
+    def __init__(self):
+        super().__init__("Fly", Type.FLYING, 90, 95, 15, Status.NONE)
+
+class Gust(Move):
+    def __init__(self):
+        super().__init__("Gust", Type.FLYING, 40, 35)
+
+class Peck(Move):
+    def __init__(self):
+        super().__init__("Peck", Type.FLYING, 35, 35)
+
+class SkyAttack(StatusMove): #TODO two turn attack
+    def __init__(self):
+        super().__init__("Sky Attack", Type.FLYING, 140, 90, 5, Status.NONE)
+
+class WingAttack(Move):
+    def __init__(self):
+        super().__init__("WingAttack", Type.FLYING, 60, 35)
+######################################################################################################################################################################
+
+#Rock Moves
+class RockSlide(StatusMove): #TODO Consider adding flinching
+    def __init__(self):
+        super().__init__("Rock Slide", Type.ROCK, 75, 90, 10, Status.NONE)
+
+class RockThrow(StatusMove): 
+    def __init__(self):
+        super().__init__("Rock Throw", Type.ROCK, 50, 90, 15, Status.NONE)
+######################################################################################################################################################################
+
+#Ghost Moves
+class Lick(StatusMove):
+    def __init__(self):
+        super().__init__("Lick", Type.GHOST, 30, 100, 30, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 30:
+            target.set_status(Status.PARALYSIS)
+        return result
+
+class ConfuseRay(StatusMove):
+    def __init__(self):
+        super().__init__("Confuse Ray", Type.GHOST, 0, 100, 10, Status.CONFUSION)
+
+class NightShade(Move):
+    def __init__(self):
+        super().__init__("Night Shade", Type.GHOST, 0, 15)
+    
+    def use(self, user, target):
+        self.damage = user.level
+        super().use(user, target)
+######################################################################################################################################################################
+
+#Dragon Moves
+class DragonRage(Move):
+    def __init__(self):
+        super().__init__("Dragon Rage", Type.DRAGON, 0, 10)
+    
+    def use(self, user, target):
+        if(user.status != Status.NONE):
+            return self.check_status(user)
+            
+        Game.set_text(user.name + " used " + self.name + " on " + target.name)
+        target.take_damage(40)
+        self.current_uses -= 1
+        return Status.NONE
+######################################################################################################################################################################
+
+#Dark Moves
+class Bite(StatusMove): #TODO Consider adding flinching
+    def __init__(self):
+        super().__init__("Bite", Type.DARK, 60, 100, 25, Status.NONE)
+######################################################################################################################################################################
+
+#Grass Moves
+class Absorb(AbsorptionMove):
+    def __init__(self):
+        super().__init__("Absorb", Type.GRASS, 20, 100, 25)
+
+class MegaDrain(AbsorptionMove):
+    def __init__(self):
+        super().__init__("Mega Drain", Type.GRASS, 40, 100, 15)
+
+class RazorLeaf(Move):
+    def __init__(self):
+        self.accuracy = 95
+        super().__init__("Razor Leaf", Type.GRASS, 55, 25)
+
+class SleepPowder(StatusMove):
+    def __init__(self):
+        super().__init__("Sleep Powder", Type.GRASS, 0, 75, 15, Status.SLEEP)
 
 class VineWhip(Move):
     def __init__(self):
         super().__init__("Vine Whip", Type.GRASS, 45, 25)
+
+class PetalDance(StatusMove): #TODO Attacks 2-3 times
+    def __init__(self):
+        super().__init__("Petal Dance", Type.GRASS, 120, 100, 10, Status.NONE)
+    
+    def use(self, user, target):
+        super().use(user, target)
+        user.set_status(Status.CONFUSION)
+
+class Spore(StatusMove):
+    def __init__(self):
+        super().__init__("Spore", Type.GRASS, 0, 100, 15, Status.SLEEP)
+
+class StunSpore(StatusMove):
+    def __init__(self):
+        super().__init__("Stun Spore", Type.GRASS, 0, 75, 30, Status.PARALYSIS)
+
+class SolarBeam(StatusMove): #TODO two turn attack
+    def __init__(self):
+        super().__init__("Solar Beam", Type.GRASS, 120, 100, 10, Status.NONE)
+
+#TODO create Leech Seed
+######################################################################################################################################################################
+
+#Fighting Moves
+class DoubleKick(StatusMove):#TODO should cause damage 2 times
+    def __init__(self):
+        super().__init__("Double Kick", Type.FIGHTING, 30, 100, 30, Status.NONE)
+
+class HighJumpKick(StatusMove):#TODO should cause damage to itself if misses
+    def __init__(self):
+        super().__init__("Double Kick", Type.FIGHTING, 130, 90, 30, Status.NONE)
+
+class JumpKick(StatusMove):#TODO should cause damage to itself if misses
+    def __init__(self):
+        super().__init__("Double Kick", Type.FIGHTING, 100, 95, 30, Status.NONE)
+
+class karateChop(Move):
+    def __init__(self):
+        super().__init__("Karate Chop", Type.FIGHTING, 50, 25)
+
+class RollingKick(Move):#TODO Consider adding flinching
+    def __init__(self):
+        super().__init__("Rolling Kick", Type.FIGHTING, 60, 15)
+
+class SeismicToss(Move):
+    def __init__(self):
+        super().__init__("Seismic Toss", Type.FIGHTING, 0, 20)
+    
+    def use(self, user, target):
+        self.damage = user.level
+        super().use(user, target)
+######################################################################################################################################################################
+
+#Normal Moves
+
+
+######################################################################################################################################################################
+
+#Admin Moves:
+class TestMove(Move):
+    def __init__(self):
+        super().__init__("Fake Move", Type.NONE, 0, 100)
+######################################################################################################################################################################
+
+
+
+
 
 
 class Button:
