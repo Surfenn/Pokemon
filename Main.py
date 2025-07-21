@@ -851,20 +851,130 @@ class Mew(Pokemon):
         self.moves.append(PoisonGas())
 
 
-
-
-
 class SleepPowder(StatusMove):
     def __init__(self):
         super().__init__("Sleep Powder", Type.GRASS, 0, 15, Status.SLEEP)
 
+
+
+#Fire Moves
 class WillOWisp(StatusMove):
     def __init__(self):
         super().__init__("Will-O-Wisp", Type.FIRE, 0, 15, Status.BURN)
 
+class Ember(StatusMove):
+    def __init__(self):
+        super().__init__("Ember", Type.FIRE, 40, 25, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.BURN)
+        return result
+    
+class FireBlast(StatusMove):
+    def __init__(self):
+        super().__init__("Fire Blast", Type.FIRE, 110, 5, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.BURN)
+        return result
+
+class FireSpin(StatusMove):#TODO should cause burning for 4-5 turns
+    def __init__(self):
+        super().__init__("Fire Spin", Type.FIRE, 35, 15, Status.NONE)
+
+
+class FirePunch(StatusMove):
+    def __init__(self):
+        super().__init__("Fire Punch", Type.FIRE, 75, 15, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.BURN)
+        return result
+
+class Flamethrower(StatusMove):
+    def __init__(self):
+        super().__init__("Flamethrower", Type.FIRE, 90, 15, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.BURN)
+        return result
+
+################################################################################################
+
+#Electric Moves
 class ThunderWave(StatusMove):
     def __init__(self):
         super().__init__("ThunderWave", Type.ELECTRIC, 0, 20, Status.PARALYSIS)
+
+class Thunderbolt(StatusMove):
+    def __init__(self):
+        super().__init__("Thunderbolt", Type.ELECTRIC, 90, 15, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.PARALYSIS)
+        return result
+
+class ThunderShock(StatusMove):
+    def __init__(self):
+        super().__init__("Thunder Shock", Type.ELECTRIC, 40, 30, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.PARALYSIS)
+        return result
+    
+class ThunderPunch(StatusMove):
+    def __init__(self):
+        super().__init__("Thunder Punch", Type.ELECTRIC, 75, 15, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.PARALYSIS)
+        return result
+
+class Thunder(StatusMove):
+    def __init__(self):
+        super().__init__("Thunder Shock", Type.ELECTRIC, 110, 10, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 30:
+            target.set_status(Status.PARALYSIS)
+        return result
+################################################################################################
+
+#poison Moves
+class Acid(Move):
+    def __init__(self):
+        super().__init__("Acid", Type.POISON, 40, 30)
 
 class Toxic(StatusMove):
     def __init__(self):
@@ -874,6 +984,46 @@ class PoisonGas(StatusMove):
     def __init__(self):
         super().__init__("Poison Gas", Type.POISON, 0, 40, Status.POISON)
 
+class PoisonPowder(StatusMove):
+    def __init__(self):
+        super().__init__("Poison Powder", Type.POISON, 0, 35, Status.POISON)
+
+class Smog(StatusMove):
+    def __init__(self):
+        super().__init__("Smog", Type.POISON, 30, 20, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 40:
+            target.set_status(Status.POISON)
+        return result
+
+class Sludge(StatusMove):
+    def __init__(self):
+        super().__init__("Sludge", Type.POISON, 65, 20, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 30:
+            target.set_status(Status.POISON)
+        return result
+
+class PosionSting(StatusMove):
+    def __init__(self):
+        super().__init__("Posion Sting", Type.POISON, 15, 35, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 30:
+            target.set_status(Status.POISON)
+        return result
+
 class PowderSnow(StatusMove):
     def __init__(self):
         super().__init__("Powder Snow", Type.ICE, 40, 25, Status.NONE)
@@ -882,21 +1032,60 @@ class PowderSnow(StatusMove):
         result = super().use(user, target)
         if result != Status.NONE:
             return result
-        if random.randint(1, 100) < 10:
+        if random.randint(1, 100) <= 10:
             target.set_status(Status.FROZEN)
         return result
+################################################################################################
 
+#Water Moves
 class WaterGun(Move):
     def __init__(self):
         super().__init__("Water Gun", Type.WATER, 40, 25)
+
+class Waterfall(Move):
+    def __init__(self):
+        super().__init__("Waterfall", Type.WATER, 80, 15)
+
+class Surf(Move):
+    def __init__(self):
+        super().__init__("Surf", Type.WATER, 90, 15)
+
+class HydroPump(Move):
+    def __init__(self):
+        super().__init__("Hydro Pump", Type.WATER, 110, 5)
+
+class Crabhammer(Move):
+    def __init__(self):
+        super().__init__("Crabhammer", Type.WATER, 100, 10)
+
+class Clamp(StatusMove):#TODO should cause damgage for 4-5 turns
+    def __init__(self):
+        super().__init__("Clamp", Type.Water, 35, 15, Status.NONE)
+
+class Bubble(Move):
+    def __init__(self):
+        super().__init__("Bubble", Type.WATER, 40, 30)
+
+class BubbleBeam(Move):
+    def __init__(self):
+        super().__init__("Bubble Beam", Type.WATER, 65, 20)
+################################################################################################
+
+#Psychic Moves
+class Psychic(Move):
+    def __init__(self):
+        super().__init__("Psychic", Type.PSYCHIC, 90, 10)
+
+class Confusion(StatusMove):
+    pass
+
+
 
 class TestMove(Move):
     def __init__(self):
         super().__init__("Fake Move", Type.NONE, 0, 100)
 
-class Psychic(Move):
-    def __init__(self):
-        super().__init__("Psychic", Type.PSYCHIC, 90, 10)
+
 
 class RollingKick(Move):
     def __init__(self):
@@ -905,10 +1094,6 @@ class RollingKick(Move):
 class VineWhip(Move):
     def __init__(self):
         super().__init__("Vine Whip", Type.GRASS, 45, 25)
-
-class Ember(Move):
-    def __init__(self):
-        super().__init__("Ember", Type.FIRE, 40, 25)
 
 
 class Button:
@@ -946,14 +1131,16 @@ class PokemonButton(Button):
         super().__init__(position, PokemonButton.size, str(index))
         self.pokemon = pokemon
         self.health_bar = HealthBar((position[0] + 125, position[1] + 50), pokemon)
-        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), pokemon.name, pokemon.type, pokemon.status)
-        self.type_label2 = TypeLabel((position[0] + Button.margin + 200, position[1] + Button.margin), '', pokemon.type2, pokemon.status)
+        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), pokemon.name, pokemon.type)
+        self.type_label2 = TypeLabel((position[0] + Button.margin + 200, position[1] + Button.margin), '', pokemon.type2)
+        self.status_label = StatusLabel((position[0] + Button.margin + 400, position[1] + Button.margin), pokemon.status)
 
     def draw(self):
         pygame.draw.rect(screen, pygame.Color(200,200,255) if self.is_active else pygame.Color(100, 100, 100), pygame.Rect(self.position, PokemonButton.size))
         
         self.type_label.draw()
         self.type_label2.draw()
+        self.status_label.draw()
         self.health_bar.draw()
     
     def process(self):
@@ -970,7 +1157,7 @@ class MoveButton(Button):
     def __init__(self, position, move, index):
         super().__init__(position, MoveButton.size, str(index))
         self.move = move
-        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), move.name, move.type, Status.NONE)
+        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), move.name, move.type)
     
     def draw(self):
         pygame.draw.rect(screen, pygame.Color(200,200,255), pygame.Rect(self.position, MoveButton.size))
@@ -997,21 +1184,26 @@ class HealthBar():
 
 
 class TypeLabel():
-    def __init__(self, position, text, type, status):
+    def __init__(self, position, text, type):
         self.text = text
         self.type = type
         self.position = position
-        self.status = status
 
     def draw(self):
         surface = font.render(self.text, True, pygame.Color(0, 0, 0))
         screen.blit(surface, self.position)
         if self.type in Type.sprites:
             screen.blit(Type.sprites[self.type], (self.position[0] + surface.get_size()[0] + 20, self.position[1]))
+
+class StatusLabel():
+    def __init__(self, position, status):
+        self.position = position
+        self.status = status
+
+    def draw(self):
         if self.status in Status.sprites:
             sprite = pygame.transform.scale_by(Status.sprites[self.status], 3)
-            screen.blit(sprite, (self.position[0] + surface.get_size()[0] + 120, self.position[1]))
-        
+            screen.blit(sprite, (self.position[0], self.position[1]))
 
 pygame.init()
 BUTTON_PRESSED = pygame.event.custom_type()
@@ -1114,9 +1306,9 @@ class Game:
                 
                 if len(self.message_queue) >= 1:
                     continue
+            
                 if self.state == Game.PLAYER1_CHOOSE_POKEMON:
                     self.choose_pokemon(self.players[0], int(event.dict['name']))
-                    
 
                     self.set_state()
                 elif self.state == Game.PLAYER2_CHOOSE_POKEMON:
@@ -1126,6 +1318,7 @@ class Game:
                 elif self.state == Game.PLAYER1_CHOOSE_MOVE:
                     self.player1_move = self.choose_move(self.players[0], int(event.dict['name']))
                     self.set_state()
+                
                 elif self.state == Game.PLAYER2_CHOOSE_MOVE:
                     player2_move = self.choose_move(self.players[1], int(event.dict['name']))
                     self.resolve1(self.players[0], self.players[1], self.player1_move, player2_move)
@@ -1211,7 +1404,7 @@ class Game:
         pos2 = (50, 525)
         # Drawing 
         screen.fill(pygame.Color(255,255,255)) # Clear Screen
-        for button in self.buttons[self.state]:
+        for button in self.buttons[self.state]: #TODO Add Status to pokemon button
             button.draw()
 
         for player in self.players:
@@ -1219,8 +1412,9 @@ class Game:
                 sprite = player.active_pokemon.sprite
                 sprite = pygame.transform.scale_by(sprite, 5)
                 screen.blit(sprite, (0 + 400 * player.index, 150 - 250 * player.index)) # Draw Sprite
-                TypeLabel((600 - 500 * player.index, 400 - 300 * player.index), player.active_pokemon.name, player.active_pokemon.type, player.active_pokemon.status).draw()
-                TypeLabel((800 - 500 * player.index, 400 - 300 * player.index), '', player.active_pokemon.type2, player.active_pokemon.status).draw()
+                TypeLabel((600 - 500 * player.index, 400 - 300 * player.index), player.active_pokemon.name, player.active_pokemon.type).draw()
+                TypeLabel((800 - 500 * player.index, 400 - 300 * player.index), '', player.active_pokemon.type2).draw()
+                StatusLabel((550 - 500 * player.index, 445 - 300 * player.index), player.active_pokemon.status).draw()
                 self.health_bars[player.index].draw()
 
         if self.state == Game.PLAYER1_CHOOSE_POKEMON:
