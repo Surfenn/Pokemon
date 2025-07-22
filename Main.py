@@ -40,6 +40,8 @@ class Pokemon:
         self.sleep_count = 0
         self.poison_count = 0
         self.frozen_count = 0
+        self.burn_count = None
+        self.water_burn = 0
         if index == 0:
             self.sprite = pygame.image.load(os.path.join('Images', sprite_path + " back.png" ))
         elif index == 1:
@@ -93,7 +95,7 @@ class Move:
         return self.name + " (" + str(Type.names[self.type]) + ") " + str(self.current_uses) + "/" + str(self.max_uses)
     
     def use(self, user, target):
-        if(user.status == Status.SLEEP or user.status == Status.FROZEN):
+        if(user.status == Status.SLEEP or user.status == Status.FROZEN or user.status == Status.FLINCH):
             return self.check_status(user)
         elif(user.status == Status.PARALYSIS):
             if random.randint(1, 100) < 25:
@@ -135,12 +137,13 @@ class Move:
                 Game.set_text(user.name + " is Frozen")
                 user.frozen_count -= 1
                 return Status.FROZEN
+        elif(user.status == Status.FLINCH):
+            user.set_status(Status.NONE)
+            Game.set_text(user.name + " Flinched")
             
 
-
-
 class Status:
-    names = ["","Switch", "Burned", "Asleep", "Fainted", "Frozen", "Paralysis", "Poisoned", "PoisonedBad", "Confused"]
+    names = ["","Switch", "Burned", "Asleep", "Fainted", "Frozen", "Paralysis", "Poisoned", "PoisonedBad", "Confused", "Flinched", "WaterBurn"]
     NONE = 0
     SWITCHED = 1
     BURN = 2
@@ -151,7 +154,9 @@ class Status:
     POISON = 7
     POISONEDBAD = 8
     CONFUSION = 9
-    COUNT = 10
+    FLINCH = 10
+    WATERBURN = 11
+    COUNT = 12
     sprites = {}
     
     def get_status_path(status):
@@ -178,6 +183,58 @@ class StatusMove(Move):
             return result
         target.set_status(self.status)
         return result
+
+
+class FlinchingMoves(StatusMove):
+    def __init__(self, name, type, damage, accuracy, max_uses, flinch_chance):
+        super().__init__(name, type, damage,accuracy, max_uses, Status.NONE)
+        self.flinch_chance = flinch_chance
+        self.status = Status.FLINCH
+        self.accuracy = accuracy
+
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if user.speed > target.speed:
+            if random.randint(1, 100) <= self.flinch_chance:
+                target.set_status(self.status)
+        return result
+
+
+class MultiHitMoves(Move):
+    def __init__(self, name, type, damage, accuracy, max_uses, hit_number):
+        super().__init__(name, type, damage, max_uses)
+        self.accuracy = accuracy
+        self.hit_number = hit_number
+
+    def use(self, user, target):
+        if(user.status == Status.SLEEP or user.status == Status.FROZEN or user.status == Status.FLINCH):
+            return self.check_status(user)
+        elif(user.status == Status.PARALYSIS):
+            if random.randint(1, 100) < 25:
+                Game.set_text(user.name + " is Paralyzed")
+                return Status.PARALYSIS
+        
+        if random.randint(1, 100) <= self.accuracy:   
+            if self.type == user.type:
+                stab = 1.5
+            else:
+                stab = 1
+            first_damage = int((((((2 * user.level)//5) + 2) * self.damage * (user.attack // user.defense)) // 50))
+            total_damage = int(first_damage * stab * (Type.effectiveness[self.type][target.type] * Type.effectiveness[self.type][target.type2]))
+            if user.status == Status.BURN:
+                total_damage //= 2
+            for i in range(self.hit_number):
+                Game.set_text(user.name + " used " + self.name + " on " + target.name + " " + str(i + 1) + " times")
+                target.take_damage(total_damage)
+            self.current_uses -= 1
+            return Status.NONE
+        else:
+            Game.set_text(user.name + " Missed")
+            return Status.NONE
+        
+
 
 class AbsorptionMove(Move):
     def __init__(self, name, type, damage, accuracy, max_uses):
@@ -279,14 +336,12 @@ class Type:
 
 
 #All Gen 1 Pokemon 
-
 class Bulbasaur(Pokemon):
     def __init__(self, index):
         super().__init__("Bulbasaur", Type.GRASS, 5, 45, 49, 49, 45, "bulbasaur", index)
         self.type2 = Type.POISON
         self.moves.append(VineWhip())
         
-
 class Ivysaur(Pokemon):
     def __init__(self, index):
         super().__init__("Ivysaur", Type.GRASS, 16, 60, 62, 63, 60, "ivysaur", index)
@@ -597,6 +652,31 @@ class Victreebel(Pokemon):
         super().__init__("Victreebel", Type.GRASS, 36, 80, 105, 65, 70, "victreebel", index)
         self.type2 = Type.POISON
 
+class Tentacool(Pokemon):
+    def __init__(self, index):
+        super().__init__("Tentacool", Type.WATER, 5, 40, 40, 35, 70, "tentacool", index)
+        self.type2 = Type.POISON
+
+class Tentacruel(Pokemon):
+    def __init__(self, index):
+        super().__init__("Tentacruel", Type.WATER, 30, 80, 70, 65, 100, "tentacruel", index)
+        self.type2 = Type.POISON
+
+class Geodude(Pokemon):
+    def __init__(self, index):
+        super().__init__("Geodude", Type.ROCK, 5, 40, 80, 100, 20, "geodude", index)
+        self.type2 = Type.GROUND
+
+class Graveler(Pokemon):
+    def __init__(self, index):
+        super().__init__("Graveler", Type.ROCK, 25, 55, 95, 115, 35, "graveler", index)
+        self.type2 = Type.GROUND
+
+class Golem(Pokemon):
+    def __init__(self, index):
+        super().__init__("Golem", Type.ROCK, 36, 80, 110, 130, 45, "golem", index)
+        self.type2 = Type.GROUND
+
 class Ponyta(Pokemon):
     def __init__(self, index):
         super().__init__("Ponyta", Type.FIRE, 5, 50, 85, 55, 90, "ponyta", index)
@@ -796,7 +876,7 @@ class Starmie(Pokemon):
 
 class Mrmime(Pokemon):
     def __init__(self, index):
-        super().__init__("Mr. Mime", Type.PSYCHIC, 20, 40, 45, 65, 90, "mrmime", index)
+        super().__init__("Mr. Mime", Type.PSYCHIC, 20, 40, 45, 65, 90, "mr-mime", index)
 
 class Scyther(Pokemon):
     def __init__(self, index):
@@ -858,6 +938,39 @@ class Flareon(Pokemon):
     def __init__(self, index):
         super().__init__("Flareon", Type.FIRE, 36, 65, 130, 60, 65, "flareon", index)
 
+class Porygon(Pokemon):
+    def __init__(self, index):
+        super().__init__("Porygon", Type.NORMAL, 5, 65, 60, 70, 40, "porygon", index)
+
+class Omanyte(Pokemon):
+    def __init__(self, index):
+        super().__init__("Omanyte", Type.ROCK, 5, 35, 40, 100, 35, "omanyte", index)
+        self.type2 = Type.WATER
+
+class Omastar(Pokemon):
+    def __init__(self, index):
+        super().__init__("Omastar", Type.ROCK, 40, 70, 60, 125, 55, "omastar", index)
+        self.type2 = Type.WATER
+
+class Kabuto(Pokemon):
+    def __init__(self, index):
+        super().__init__("Kabuto", Type.ROCK, 5, 30, 80, 90, 55, "kabuto", index)
+        self.type2 = Type.WATER
+
+class Kabutops(Pokemon):
+    def __init__(self, index):
+        super().__init__("Kabutops", Type.ROCK, 40, 60, 115, 105, 80, "kabutops", index)
+        self.type2 = Type.WATER
+
+class Aerodactyl(Pokemon):
+    def __init__(self, index):
+        super().__init__("Aerodactyl", Type.ROCK, 40, 80, 105, 65, 130, "aerodactyl", index)
+        self.type2 = Type.FLYING
+
+class Snorlax(Pokemon):
+    def __init__(self, index):
+        super().__init__("Snorlax", Type.NORMAL, 30, 160, 110, 65, 30, "snorlax", index)
+
 class Articuno(Pokemon):
     def __init__(self, index):
         super().__init__("Articuno", Type.ICE, 50, 90, 85, 100, 85, "articuno", index)
@@ -895,8 +1008,9 @@ class Mew(Pokemon):
     def __init__(self, index):
         super().__init__("Mew", Type.PSYCHIC, 70, 100, 100, 100, 100, "mew", index)
         self.moves.append(Rest())
-        self.moves.append(FireBlast())
-        self.moves.append(Absorb())
+        self.moves.append(HighJumpKick())
+        self.moves.append(PetalDance())
+        self.moves.append(TestMove())
 
 
 ######################################################################################################################################################################
@@ -931,10 +1045,15 @@ class FireBlast(StatusMove):
             target.set_status(Status.BURN)
         return result
 
-class FireSpin(StatusMove):#TODO should cause burning for 4-5 turns
+class FireSpin(StatusMove):
     def __init__(self):
         super().__init__("Fire Spin", Type.FIRE, 35, 85, 15, Status.NONE)
-
+    
+    def use(self, user, target):
+        super().use(user, target)
+        target.set_status(Status.BURN) 
+        target.burn_count = 5
+        
 
 class FirePunch(StatusMove):
     def __init__(self):
@@ -1076,9 +1195,9 @@ class WaterGun(Move):
     def __init__(self):
         super().__init__("Water Gun", Type.WATER, 40, 25)
 
-class Waterfall(Move):
+class Waterfall(FlinchingMoves):
     def __init__(self):
-        super().__init__("Waterfall", Type.WATER, 80, 15)
+        super().__init__("Waterfall", Type.WATER, 80, 100, 15, 20)
 
 class Surf(Move):
     def __init__(self):
@@ -1092,9 +1211,13 @@ class Crabhammer(Move):
     def __init__(self):
         super().__init__("Crabhammer", Type.WATER, 100, 10)
 
-class Clamp(StatusMove):#TODO should cause damage for 4-5 turns
+class Clamp(StatusMove):
     def __init__(self):
-        super().__init__("Clamp", Type.Water, 35, 85, 15, Status.NONE)
+        super().__init__("Clamp", Type.WATER, 35, 85, 15, Status.WATERBURN)
+    
+    def use(self, user, target):
+        super().use(user, target)
+        target.water_burn = 5
 
 class Bubble(Move):
     def __init__(self):
@@ -1211,19 +1334,19 @@ class Earthquake(Move):
 
 class Fissure(StatusMove):
     def __init__(self):
-        super().__init__("Fissure", Type.Ground, 1000000000, 30, 15, Status.NONE)
+        super().__init__("Fissure", Type.GROUND, 1000000000, 30, 15, Status.NONE)
 
-class BoneClub(StatusMove):
+class BoneClub(FlinchingMoves):
     def __init__(self):
-        super().__init__("Bone Club", Type.Ground, 65, 85, 20, Status.NONE)
+        super().__init__("Bone Club", Type.GROUND, 65, 85, 20, 10)
 
-class Bonemerang(StatusMove): #TODO Hits Twice
+class Bonemerang(MultiHitMoves):
     def __init__(self):
-        super().__init__("Bonemerang", Type.Ground, 50, 90, 10, Status.NONE)
+        super().__init__("Bonemerang", Type.GROUND, 50, 90, 10, 2)
 
 class Dig(StatusMove): #TODO two turn attack
     def __init__(self):
-        super().__init__("Dig", Type.Ground, 80, 100, 10, Status.NONE)
+        super().__init__("Dig", Type.GROUND, 80, 100, 10, Status.NONE)
 ######################################################################################################################################################################
 
 #Flying moves
@@ -1243,7 +1366,7 @@ class Peck(Move):
     def __init__(self):
         super().__init__("Peck", Type.FLYING, 35, 35)
 
-class SkyAttack(StatusMove): #TODO two turn attack
+class SkyAttack(StatusMove): #TODO two turn attack and causes flinching
     def __init__(self):
         super().__init__("Sky Attack", Type.FLYING, 140, 90, 5, Status.NONE)
 
@@ -1253,9 +1376,9 @@ class WingAttack(Move):
 ######################################################################################################################################################################
 
 #Rock Moves
-class RockSlide(StatusMove): #TODO Consider adding flinching
+class RockSlide(FlinchingMoves): 
     def __init__(self):
-        super().__init__("Rock Slide", Type.ROCK, 75, 90, 10, Status.NONE)
+        super().__init__("Rock Slide", Type.ROCK, 75, 90, 10, 30)
 
 class RockThrow(StatusMove): 
     def __init__(self):
@@ -1304,9 +1427,9 @@ class DragonRage(Move):
 ######################################################################################################################################################################
 
 #Dark Moves
-class Bite(StatusMove): #TODO Consider adding flinching
+class Bite(FlinchingMoves): 
     def __init__(self):
-        super().__init__("Bite", Type.DARK, 60, 100, 25, Status.NONE)
+        super().__init__("Bite", Type.DARK, 60, 100, 25, 30)
 ######################################################################################################################################################################
 
 #Grass Moves
@@ -1331,9 +1454,9 @@ class VineWhip(Move):
     def __init__(self):
         super().__init__("Vine Whip", Type.GRASS, 45, 25)
 
-class PetalDance(StatusMove): #TODO Attacks 2-3 times
+class PetalDance(MultiHitMoves):
     def __init__(self):
-        super().__init__("Petal Dance", Type.GRASS, 120, 100, 10, Status.NONE)
+        super().__init__("Petal Dance", Type.GRASS, 120, 100, 10, 3)
     
     def use(self, user, target):
         super().use(user, target)
@@ -1355,25 +1478,77 @@ class SolarBeam(StatusMove): #TODO two turn attack
 ######################################################################################################################################################################
 
 #Fighting Moves
-class DoubleKick(StatusMove):#TODO should cause damage 2 times
+class DoubleKick(MultiHitMoves):
     def __init__(self):
-        super().__init__("Double Kick", Type.FIGHTING, 30, 100, 30, Status.NONE)
+        super().__init__("Double Kick", Type.FIGHTING, 30, 100, 30, 2)
 
 class HighJumpKick(StatusMove):#TODO should cause damage to itself if misses
     def __init__(self):
-        super().__init__("Double Kick", Type.FIGHTING, 130, 90, 30, Status.NONE)
+        super().__init__("Double Kick", Type.FIGHTING, 130, 50, 30, Status.NONE)
+
+    def use(self, user, target):
+        if(user.status == Status.SLEEP or user.status == Status.FROZEN or user.status == Status.FLINCH):
+            return self.check_status(user)
+        elif(user.status == Status.PARALYSIS):
+            if random.randint(1, 100) < 25:
+                Game.set_text(user.name + " is Paralyzed")
+                return Status.PARALYSIS
+        
+        if random.randint(1, 100) <= self.accuracy:   
+            Game.set_text(user.name + " used " + self.name + " on " + target.name)
+            if self.type == user.type:
+                stab = 1.5
+            else:
+                stab = 1
+            first_damage = int((((((2 * user.level)//5) + 2) * self.damage * (user.attack // user.defense)) // 50))
+            total_damage = int(first_damage * stab * (Type.effectiveness[self.type][target.type] * Type.effectiveness[self.type][target.type2]))
+            if user.status == Status.BURN:
+                total_damage //= 2
+            target.take_damage(total_damage)
+            self.current_uses -= 1
+            return Status.NONE
+        else:
+            Game.set_text(user.name + " Missed And Lost Half Their Health")
+            user.current_health -= user.max_health // 2
+            return Status.NONE
 
 class JumpKick(StatusMove):#TODO should cause damage to itself if misses
     def __init__(self):
         super().__init__("Double Kick", Type.FIGHTING, 100, 95, 30, Status.NONE)
+    
+    def use(self, user, target):
+        if(user.status == Status.SLEEP or user.status == Status.FROZEN or user.status == Status.FLINCH):
+            return self.check_status(user)
+        elif(user.status == Status.PARALYSIS):
+            if random.randint(1, 100) < 25:
+                Game.set_text(user.name + " is Paralyzed")
+                return Status.PARALYSIS
+        
+        if random.randint(1, 100) <= self.accuracy:   
+            Game.set_text(user.name + " used " + self.name + " on " + target.name)
+            if self.type == user.type:
+                stab = 1.5
+            else:
+                stab = 1
+            first_damage = int((((((2 * user.level)//5) + 2) * self.damage * (user.attack // user.defense)) // 50))
+            total_damage = int(first_damage * stab * (Type.effectiveness[self.type][target.type] * Type.effectiveness[self.type][target.type2]))
+            if user.status == Status.BURN:
+                total_damage //= 2
+            target.take_damage(total_damage)
+            self.current_uses -= 1
+            return Status.NONE
+        else:
+            Game.set_text(user.name + " Missed And Lost Half Their Health")
+            user.current_health -= user.max_health // 2
+            return Status.NONE
 
 class karateChop(Move):
     def __init__(self):
         super().__init__("Karate Chop", Type.FIGHTING, 50, 25)
 
-class RollingKick(Move):#TODO Consider adding flinching
+class RollingKick(FlinchingMoves):
     def __init__(self):
-        super().__init__("Rolling Kick", Type.FIGHTING, 60, 15)
+        super().__init__("Rolling Kick", Type.FIGHTING, 60, 85, 15, 30)
 
 class SeismicToss(Move):
     def __init__(self):
@@ -1394,10 +1569,6 @@ class TestMove(Move):
     def __init__(self):
         super().__init__("Fake Move", Type.NONE, 0, 100)
 ######################################################################################################################################################################
-
-
-
-
 
 
 class Button:
@@ -1552,20 +1723,81 @@ class Game:
             Player("player1", 0),
             Player("player2", 1),        
         ]
-        self.players[0].add_pokemon(Charmander(0))
-        self.players[1].add_pokemon(Charmander(1))
-        self.players[0].add_pokemon(Bulbasaur(0))
-        self.players[1].add_pokemon(Bulbasaur(1))
-        self.players[0].add_pokemon(Squirtle(0)) 
-        self.players[1].add_pokemon(Squirtle(1)) 
-        self.players[0].add_pokemon(Mew(0)) 
-        self.players[1].add_pokemon(Mew(1)) 
-        self.players[0].add_pokemon(Hitmonchan(0)) 
-        self.players[1].add_pokemon(Hitmonchan(1)) 
+        AllP1Pokemon = [
+            Bulbasaur(0), Ivysaur(0), Venusaur(0), Charmander(0), Charmeleon(0), Charizard(0),
+            Squirtle(0), Wartortle(0), Blastoise(0), Caterpie(0), Metapod(0), Butterfree(0),
+            Weedle(0), Kakuna(0), Beedrill(0), Pidgey(0), Pidgeotto(0), Pidgeot(0),
+            Rattata(0), Raticate(0), Spearow(0), Fearow(0), Ekans(0), Arbok(0),
+            Pikachu(0), Raichu(0), Sandshrew(0), Sandslash(0), NidoranF(0), Nidorina(0),
+            Nidoqueen(0), NidoranM(0), Nidorino(0), Nidoking(0), Clefairy(0), Clefable(0),
+            Vulpix(0), Ninetales(0), Jigglypuff(0), Wigglytuff(0), Zubat(0), Golbat(0),
+            Oddish(0), Gloom(0), Vileplume(0), Paras(0), Parasect(0), Venonat(0),
+            Venomoth(0), Diglett(0), Dugtrio(0), Meowth(0), Persian(0), Psyduck(0),
+            Golduck(0), Mankey(0), Primeape(0), Growlithe(0), Arcanine(0), Poliwag(0),
+            Poliwhirl(0), Poliwrath(0), Abra(0), Kadabra(0), Alakazam(0), Machop(0),
+            Machoke(0), Machamp(0), Bellsprout(0), Weepinbell(0), Victreebel(0), Tentacool(0),
+            Tentacruel(0), Geodude(0), Graveler(0), Golem(0), Ponyta(0), Rapidash(0),
+            Slowpoke(0), Slowbro(0), Magnemite(0), Magneton(0), Farfetchd(0), Doduo(0),
+            Dodrio(0), Seel(0), Dewgong(0), Grimer(0), Muk(0), Shellder(0),
+            Cloyster(0), Gastly(0), Haunter(0), Gengar(0), Onix(0), Drowzee(0),
+            Hypno(0), Krabby(0), Kingler(0), Voltorb(0), Electrode(0), Exeggcute(0),
+            Exeggutor(0), Cubone(0), Marowak(0), Hitmonlee(0), Hitmonchan(0), Lickitung(0),
+            Koffing(0), Weezing(0), Rhyhorn(0), Rhydon(0), Chansey(0), Tangela(0),
+            Kangaskhan(0), Horsea(0), Seadra(0), Goldeen(0), Seaking(0), Staryu(0),
+            Starmie(0), Mrmime(0), Scyther(0), Jynx(0), Electabuzz(0), Magmar(0),
+            Pinsir(0), Tauros(0), Magikarp(0), Gyarados(0), Lapras(0), Ditto(0),
+            Eevee(0), Vaporeon(0), Jolteon(0), Flareon(0), Porygon(0), Omanyte(0),
+            Omastar(0), Kabuto(0), Kabutops(0), Aerodactyl(0), Snorlax(0), Articuno(0),
+            Zapdos(0), Moltres(0), Dratini(0), Dragonair(0), Dragonite(0), Mewtwo(0),
+            Mew(0)
+        ]
+        
+        AllP2Pokemon = [
+            Bulbasaur(1), Ivysaur(1), Venusaur(1), Charmander(1), Charmeleon(1), Charizard(1),
+            Squirtle(1), Wartortle(1), Blastoise(1), Caterpie(1), Metapod(1), Butterfree(1),
+            Weedle(1), Kakuna(1), Beedrill(1), Pidgey(1), Pidgeotto(1), Pidgeot(1),
+            Rattata(1), Raticate(1), Spearow(1), Fearow(1), Ekans(1), Arbok(1),
+            Pikachu(1), Raichu(1), Sandshrew(1), Sandslash(1), NidoranF(1), Nidorina(1),
+            Nidoqueen(1), NidoranM(1), Nidorino(1), Nidoking(1), Clefairy(1), Clefable(1),
+            Vulpix(1), Ninetales(1), Jigglypuff(1), Wigglytuff(1), Zubat(1), Golbat(1),
+            Oddish(1), Gloom(1), Vileplume(1), Paras(1), Parasect(1), Venonat(1),
+            Venomoth(1), Diglett(1), Dugtrio(1), Meowth(1), Persian(1), Psyduck(1),
+            Golduck(1), Mankey(1), Primeape(1), Growlithe(1), Arcanine(1), Poliwag(1),
+            Poliwhirl(1), Poliwrath(1), Abra(1), Kadabra(1), Alakazam(1), Machop(1),
+            Machoke(1), Machamp(1), Bellsprout(1), Weepinbell(1), Victreebel(1), Tentacool(1),
+            Tentacruel(1), Geodude(1), Graveler(1), Golem(1), Ponyta(1), Rapidash(1),
+            Slowpoke(1), Slowbro(1), Magnemite(1), Magneton(1), Farfetchd(1), Doduo(1),
+            Dodrio(1), Seel(1), Dewgong(1), Grimer(1), Muk(1), Shellder(1),
+            Cloyster(1), Gastly(1), Haunter(1), Gengar(1), Onix(1), Drowzee(1),
+            Hypno(1), Krabby(1), Kingler(1), Voltorb(1), Electrode(1), Exeggcute(1),
+            Exeggutor(1), Cubone(1), Marowak(1), Hitmonlee(1), Hitmonchan(1), Lickitung(1),
+            Koffing(1), Weezing(1), Rhyhorn(1), Rhydon(1), Chansey(1), Tangela(1),
+            Kangaskhan(1), Horsea(1), Seadra(1), Goldeen(1), Seaking(1), Staryu(1),
+            Starmie(1), Mrmime(1), Scyther(1), Jynx(1), Electabuzz(1), Magmar(1),
+            Pinsir(1), Tauros(1), Magikarp(1), Gyarados(1), Lapras(1), Ditto(1),
+            Eevee(1), Vaporeon(1), Jolteon(1), Flareon(1), Porygon(1), Omanyte(1),
+            Omastar(1), Kabuto(1), Kabutops(1), Aerodactyl(1), Snorlax(1), Articuno(1),
+            Zapdos(1), Moltres(1), Dratini(1), Dragonair(1), Dragonite(1), Mewtwo(1),
+            Mew(1)
+]
+
+        # for p1 in range(6):
+        #     randPick = random.randint(0, 150)
+        #     self.players[0].add_pokemon(AllP1Pokemon[randPick])
+        #     print(0)
+        # for p2 in range(6):
+        #     randPick = random.randint(0, 150)
+        #     self.players[1].add_pokemon(AllP2Pokemon[randPick])
+        #     print(1)
+
+        self.players[0].add_pokemon(Mew(0))
+        self.players[0].add_pokemon(Mew(0))
+        self.players[1].add_pokemon(Mew(1))
+        self.players[1].add_pokemon(Mew(1))
         self.health_bars = [HealthBar((725, 450), None), HealthBar((225, 150), None)]
 
         self.player1_move = None
-        button_offset = pygame.Vector2(500, 550)
+        button_offset = pygame.Vector2(500, 425)
         self.buttons[Game.PLAYER1_CHOOSE_POKEMON] = []
         self.buttons[Game.PLAYER2_CHOOSE_POKEMON] = []
         self.buttons[Game.PLAYER1_CHOOSE_MOVE] = []
@@ -1714,10 +1946,10 @@ class Game:
         for player in self.players:
             if player.active_pokemon != None:
                 sprite = player.active_pokemon.sprite
-                sprite = pygame.transform.scale_by(sprite, 5)
-                screen.blit(sprite, (0 + 400 * player.index, 150 - 250 * player.index)) # Draw Sprite
-                TypeLabel((600 - 500 * player.index, 400 - 300 * player.index), player.active_pokemon.name, player.active_pokemon.type).draw()
-                TypeLabel((800 - 500 * player.index, 400 - 300 * player.index), '', player.active_pokemon.type2).draw()
+                sprite = pygame.transform.scale_by(sprite, 4)
+                screen.blit(sprite, (0 + 500 * player.index, 200 - 200 * player.index)) # Draw Sprite
+                TypeLabel((500 - 450 * player.index, 400 - 300 * player.index), player.active_pokemon.name, player.active_pokemon.type).draw()
+                TypeLabel((700 - 450 * player.index, 400 - 300 * player.index), '', player.active_pokemon.type2).draw()
                 StatusLabel((550 - 500 * player.index, 445 - 300 * player.index), player.active_pokemon.status).draw()
                 self.health_bars[player.index].draw()
 
@@ -1796,8 +2028,13 @@ class Game:
 
     def on_round_end(self, pokemon):
         if pokemon.status == Status.BURN:
+            if pokemon.burn_count < 1:
+                pokemon.burn_count = None
+                pokemon.status = Status.NONE
             pokemon.take_damage(pokemon.max_health // 8)
             Game.set_text(pokemon.name + " Has Taken Burn Damage")
+            if pokemon.burn_count != None:
+                pokemon.burn_count -= 1
             return False
         elif pokemon.status == Status.POISONEDBAD:
             pokemon.poison_count += 1
@@ -1807,6 +2044,12 @@ class Game:
         elif pokemon.status == Status.POISON:
             pokemon.take_damage(pokemon.max_health // 8)
             Game.set_text(pokemon.name + " is Poisoned")
+        elif pokemon.status == Status.WATERBURN:
+            pokemon.take_damage(pokemon.max_health // 8)
+            pokemon.water_burn -= 1
+            if pokemon.water_burn == 0:
+                pokemon.status = Status.NONE
+            
         return True
 
     def has_next_button(self, state):
