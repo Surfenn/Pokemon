@@ -117,6 +117,7 @@ class Move:
             return Status.NONE
         else:
             Game.set_text(user.name + " Missed")
+            self.current_uses -= 1
             return Status.NONE
 
 
@@ -233,7 +234,6 @@ class MultiHitMoves(Move):
         else:
             Game.set_text(user.name + " Missed")
             return Status.NONE
-        
 
 
 class AbsorptionMove(Move):
@@ -301,26 +301,28 @@ class Type:
     ROCK    = 13
     GHOST   = 14
     DRAGON  = 15
-    COUNT = 16
+    DARK = 16
+    COUNT = 17
     effectiveness = [
-#    NON  FIR  GRA  WAT  NOR  ELE  ICE  FIG  POI  GRO  FLY  PSY  BUG  ROC  GHO  DRA
-    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],  # NONE
-    [1.0, 0.5, 2.0, 0.5, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 0.5, 1.0, 0.5],  # FIRE
-    [1.0, 0.5, 0.5, 2.0, 1.0, 1.0, 1.0, 0.5, 2.0, 0.5, 0.5, 1.0, 0.5, 2.0, 1.0, 0.5],  # GRASS
-    [1.0, 2.0, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 0.5],  # WATER
-    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.0, 1.0],  # NORMAL
-    [1.0, 1.0, 0.5, 1.0, 1.0, 0.5, 1.0, 1.0, 0.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 0.5],  # ELECTRIC
-    [1.0, 0.5, 2.0, 0.5, 1.0, 1.0, 0.5, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0],  # ICE
-    [2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 2.0, 1.0, 0.5, 1.0, 0.5, 0.5, 0.5, 2.0, 0.0, 1.0],  # FIGHTING
-    [1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0],  # POISON
-    [1.0, 2.0, 0.5, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 0.0, 1.0, 0.5, 2.0, 1.0, 1.0],  # GROUND
-    [1.0, 1.0, 2.0, 1.0, 1.0, 0.5, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 0.5, 1.0, 1.0],  # FLYING
-    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 1.0],  # PSYCHIC
-    [1.0, 0.5, 2.0, 1.0, 1.0, 1.0, 1.0, 0.5, 2.0, 1.0, 0.5, 2.0, 1.0, 1.0, 0.5, 1.0],  # BUG
-    [1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 0.5, 1.0, 0.5, 2.0, 1.0, 2.0, 1.0, 1.0, 1.0],  # ROCK
-    [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0],  # GHOST
-    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0],  # DRAGON
-    ]
+#    NON  FIR  GRA  WAT  NOR  ELE  ICE  FIG  POI  GRO  FLY  PSY  BUG  ROC  GHO  DRA  DAR
+    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],  # NONE
+    [1.0, 0.5, 2.0, 0.5, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 0.5, 1.0, 0.5, 1.0],  # FIRE
+    [1.0, 0.5, 0.5, 2.0, 1.0, 1.0, 1.0, 0.5, 2.0, 0.5, 0.5, 1.0, 0.5, 2.0, 1.0, 0.5, 1.0],  # GRASS
+    [1.0, 2.0, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 0.5, 1.0],  # WATER
+    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.0, 1.0, 1.0],  # NORMAL
+    [1.0, 1.0, 0.5, 1.0, 1.0, 0.5, 1.0, 1.0, 0.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0],  # ELECTRIC
+    [1.0, 0.5, 2.0, 0.5, 1.0, 1.0, 0.5, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0],  # ICE
+    [2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 2.0, 1.0, 0.5, 1.0, 0.5, 0.5, 0.5, 2.0, 0.0, 1.0, 0.5],  # FIGHTING
+    [1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0],  # POISON
+    [1.0, 2.0, 0.5, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 0.0, 1.0, 0.5, 2.0, 1.0, 1.0, 1.0],  # GROUND
+    [1.0, 1.0, 2.0, 1.0, 1.0, 0.5, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 0.5, 1.0, 1.0, 1.0],  # FLYING
+    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 1.0, 0.0],  # PSYCHIC
+    [1.0, 0.5, 2.0, 1.0, 1.0, 1.0, 1.0, 0.5, 2.0, 1.0, 0.5, 2.0, 1.0, 1.0, 0.5, 1.0, 2.0],  # BUG
+    [1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 0.5, 1.0, 0.5, 2.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0],  # ROCK
+    [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 0.5],  # GHOST
+    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0],  # DRAGON
+    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 0.5],  # DARK
+]
     
     sprites = {}
     
@@ -335,641 +337,637 @@ class Type:
                 pass
 
 
-#All Gen 1 Pokemon 
+#All Gen 1 Pokemon From https://pokemondb.net/pokedex/national
+#All Gen 1 Pokemon From https://pokemondb.net/pokedex/national
 class Bulbasaur(Pokemon):
     def __init__(self, index):
-        super().__init__("Bulbasaur", Type.GRASS, 5, 45, 49, 49, 45, "bulbasaur", index)
+        super().__init__("Bulbasaur", Type.GRASS, 50, 45, 49, 49, 45, "bulbasaur", index)
         self.type2 = Type.POISON
-        self.moves.append(VineWhip())
         
 class Ivysaur(Pokemon):
     def __init__(self, index):
-        super().__init__("Ivysaur", Type.GRASS, 16, 60, 62, 63, 60, "ivysaur", index)
+        super().__init__("Ivysaur", Type.GRASS, 50, 60, 62, 63, 60, "ivysaur", index)
         self.type2 = Type.POISON
 
 class Venusaur(Pokemon):
     def __init__(self, index):
-        super().__init__("Venusaur", Type.GRASS, 32, 80, 82, 83, 80, "venusaur", index)
+        super().__init__("Venusaur", Type.GRASS, 50, 80, 82, 83, 80, "venusaur", index)
         self.type2 = Type.POISON
 
 class Charmander(Pokemon):
     def __init__(self, index):
-        super().__init__("Charmander", Type.FIRE, 5, 39, 52, 43, 65, "charmander", index)
-        self.moves.append(FireBlast())
-        self.moves.append(WillOWisp())
+        super().__init__("Charmander", Type.FIRE, 50, 39, 52, 43, 65, "charmander", index)
 
 class Charmeleon(Pokemon):
     def __init__(self, index):
-        super().__init__("Charmeleon", Type.FIRE, 16, 58, 64, 58, 80, "charmeleon", index)
+        super().__init__("Charmeleon", Type.FIRE, 50, 58, 64, 58, 80, "charmeleon", index)
 
 class Charizard(Pokemon):
     def __init__(self, index):
-        super().__init__("Charizard", Type.FIRE, 36, 78, 84, 78, 100, "charizard", index)
+        super().__init__("Charizard", Type.FIRE, 50, 78, 84, 78, 100, "charizard", index)
         self.type2 = Type.FLYING
 
 class Squirtle(Pokemon):
     def __init__(self, index):
-        super().__init__("Squirtle", Type.WATER, 5, 44, 48, 65, 43, "squirtle", index)
-        self.moves.append(WaterGun())
+        super().__init__("Squirtle", Type.WATER, 50, 44, 48, 65, 43, "squirtle", index)
 
 class Wartortle(Pokemon):
     def __init__(self, index):
-        super().__init__("Wartortle", Type.WATER, 16, 59, 63, 80, 58, "wartortle", index)
+        super().__init__("Wartortle", Type.WATER, 50, 59, 63, 80, 58, "wartortle", index)
 
 class Blastoise(Pokemon):
     def __init__(self, index):
-        super().__init__("Blastoise", Type.WATER, 32, 79, 83, 100, 78, "blastoise", index)
+        super().__init__("Blastoise", Type.WATER, 50, 79, 83, 100, 78, "blastoise", index)
 
 class Caterpie(Pokemon):
     def __init__(self, index):
-        super().__init__("Caterpie", Type.BUG, 5, 45, 30, 35, 45, "caterpie", index)
+        super().__init__("Caterpie", Type.BUG, 50, 45, 30, 35, 45, "caterpie", index)
 
 class Metapod(Pokemon):
     def __init__(self, index):
-        super().__init__("Metapod", Type.BUG, 7, 50, 20, 55, 30, "metapod", index)
+        super().__init__("Metapod", Type.BUG, 50, 50, 20, 55, 30, "metapod", index)
 
 class Butterfree(Pokemon):
     def __init__(self, index):
-        super().__init__("Butterfree", Type.BUG, 10, 60, 45, 50, 70, "butterfree", index)
+        super().__init__("Butterfree", Type.BUG, 50, 60, 45, 50, 70, "butterfree", index)
         self.type2 = Type.FLYING
 
 class Weedle(Pokemon):
     def __init__(self, index):
-        super().__init__("Weedle", Type.BUG, 5, 40, 35, 30, 50, "weedle", index)
+        super().__init__("Weedle", Type.BUG, 50, 40, 35, 30, 50, "weedle", index)
         self.type2 = Type.POISON
 
 class Kakuna(Pokemon):
     def __init__(self, index):
-        super().__init__("Kakuna", Type.BUG, 7, 45, 25, 50, 35, "kakuna", index)
+        super().__init__("Kakuna", Type.BUG, 50, 45, 25, 50, 35, "kakuna", index)
         self.type2 = Type.POISON
 
 class Beedrill(Pokemon):
     def __init__(self, index):
-        super().__init__("Beedrill", Type.BUG, 10, 65, 90, 40, 75, "beedrill", index)
+        super().__init__("Beedrill", Type.BUG, 50, 65, 90, 40, 75, "beedrill", index)
         self.type2 = Type.POISON
 
 class Pidgey(Pokemon):
     def __init__(self, index):
-        super().__init__("Pidgey", Type.NORMAL, 5, 40, 45, 40, 56, "pidgey", index)
+        super().__init__("Pidgey", Type.NORMAL, 50, 40, 45, 40, 56, "pidgey", index)
         self.type2 = Type.FLYING
 
 class Pidgeotto(Pokemon):
     def __init__(self, index):
-        super().__init__("Pidgeotto", Type.NORMAL, 18, 63, 60, 55, 71, "pidgeotto", index)
+        super().__init__("Pidgeotto", Type.NORMAL, 50, 63, 60, 55, 71, "pidgeotto", index)
         self.type2 = Type.FLYING
 
 class Pidgeot(Pokemon):
     def __init__(self, index):
-        super().__init__("Pidgeot", Type.NORMAL, 36, 83, 80, 75, 91, "pidgeot", index)
+        super().__init__("Pidgeot", Type.NORMAL, 50, 83, 80, 75, 91, "pidgeot", index)
         self.type2 = Type.FLYING
 
 class Rattata(Pokemon):
     def __init__(self, index):
-        super().__init__("Rattata", Type.NORMAL, 5, 30, 56, 35, 72, "rattata", index)
+        super().__init__("Rattata", Type.NORMAL, 50, 30, 56, 35, 72, "rattata", index)
 
 class Raticate(Pokemon):
     def __init__(self, index):
-        super().__init__("Raticate", Type.NORMAL, 20, 55, 81, 60, 97, "raticate", index)
+        super().__init__("Raticate", Type.NORMAL, 50, 55, 81, 60, 97, "raticate", index)
 
 class Spearow(Pokemon):
     def __init__(self, index):
-        super().__init__("Spearow", Type.NORMAL, 5, 40, 60, 30, 70, "spearow", index)
+        super().__init__("Spearow", Type.NORMAL, 50, 40, 60, 30, 70, "spearow", index)
         self.type2 = Type.FLYING
 
 class Fearow(Pokemon):
     def __init__(self, index):
-        super().__init__("Fearow", Type.NORMAL, 20, 65, 90, 65, 100, "fearow", index)
+        super().__init__("Fearow", Type.NORMAL, 50, 65, 90, 65, 100, "fearow", index)
         self.type2 = Type.FLYING
 
 class Ekans(Pokemon):
     def __init__(self, index):
-        super().__init__("Ekans", Type.POISON, 5, 35, 60, 44, 55, "ekans", index)
+        super().__init__("Ekans", Type.POISON, 50, 35, 60, 44, 55, "ekans", index)
 
 class Arbok(Pokemon):
     def __init__(self, index):
-        super().__init__("Arbok", Type.POISON, 22, 60, 85, 69, 80, "arbok", index)
+        super().__init__("Arbok", Type.POISON, 50, 60, 85, 69, 80, "arbok", index)
 
 class Pikachu(Pokemon):
     def __init__(self, index):
-        super().__init__("Pikachu", Type.ELECTRIC, 5, 35, 55, 30, 90, "pikachu", index)
+        super().__init__("Pikachu", Type.ELECTRIC, 50, 35, 55, 30, 90, "pikachu", index)
 
 class Raichu(Pokemon):
     def __init__(self, index):
-        super().__init__("Raichu", Type.ELECTRIC, 20, 60, 90, 55, 100, "raichu", index)
+        super().__init__("Raichu", Type.ELECTRIC, 50, 60, 90, 55, 100, "raichu", index)
 
 class Sandshrew(Pokemon):
     def __init__(self, index):
-        super().__init__("Sandshrew", Type.GROUND, 5, 50, 75, 85, 40, "sandshrew", index)
+        super().__init__("Sandshrew", Type.GROUND, 50, 50, 75, 85, 40, "sandshrew", index)
 
 class Sandslash(Pokemon):
     def __init__(self, index):
-        super().__init__("Sandslash", Type.GROUND, 22, 75, 100, 110, 65, "sandslash", index)
+        super().__init__("Sandslash", Type.GROUND, 50, 75, 100, 110, 65, "sandslash", index)
 
 class NidoranF(Pokemon):
     def __init__(self, index):
-        super().__init__("Nidoran♀", Type.POISON, 5, 55, 47, 52, 41, "nidoran-f", index)
+        super().__init__("Nidoran♀", Type.POISON, 50, 55, 47, 52, 41, "nidoran-f", index)
 
 class Nidorina(Pokemon):
     def __init__(self, index):
-        super().__init__("Nidorina", Type.POISON, 16, 70, 62, 67, 56, "nidorina", index)
+        super().__init__("Nidorina", Type.POISON, 50, 70, 62, 67, 56, "nidorina", index)
 
 class Nidoqueen(Pokemon):
     def __init__(self, index):
-        super().__init__("Nidoqueen", Type.POISON, 36, 90, 82, 87, 76, "nidoqueen", index)
+        super().__init__("Nidoqueen", Type.POISON, 50, 90, 82, 87, 76, "nidoqueen", index)
         self.type2 = Type.GROUND
 
 class NidoranM(Pokemon):
     def __init__(self, index):
-        super().__init__("Nidoran♂", Type.POISON, 5, 46, 57, 40, 50, "nidoran-m", index)
+        super().__init__("Nidoran♂", Type.POISON, 50, 46, 57, 40, 50, "nidoran-m", index)
 
 class Nidorino(Pokemon):
     def __init__(self, index):
-        super().__init__("Nidorino", Type.POISON, 16, 61, 72, 57, 65, "nidorino", index)
+        super().__init__("Nidorino", Type.POISON, 50, 61, 72, 57, 65, "nidorino", index)
 
 class Nidoking(Pokemon):
     def __init__(self, index):
-        super().__init__("Nidoking", Type.POISON, 36, 81, 92, 77, 85, "nidoking", index)
+        super().__init__("Nidoking", Type.POISON, 50, 81, 92, 77, 85, "nidoking", index)
         self.type2 = Type.GROUND
 
 class Clefairy(Pokemon):
     def __init__(self, index):
-        super().__init__("Clefairy", Type.NORMAL, 5, 70, 45, 48, 35, "clefairy", index)
+        super().__init__("Clefairy", Type.NORMAL, 50, 70, 45, 48, 35, "clefairy", index)
 
 class Clefable(Pokemon):
     def __init__(self, index):
-        super().__init__("Clefable", Type.NORMAL, 20, 95, 70, 73, 60, "clefable", index)
+        super().__init__("Clefable", Type.NORMAL, 50, 95, 70, 73, 60, "clefable", index)
 
 class Vulpix(Pokemon):
     def __init__(self, index):
-        super().__init__("Vulpix", Type.FIRE, 5, 38, 41, 40, 65, "vulpix", index)
+        super().__init__("Vulpix", Type.FIRE, 50, 38, 41, 40, 65, "vulpix", index)
 
 class Ninetales(Pokemon):
     def __init__(self, index):
-        super().__init__("Ninetales", Type.FIRE, 25, 73, 76, 75, 100, "ninetales", index)
+        super().__init__("Ninetales", Type.FIRE, 50, 73, 76, 75, 100, "ninetales", index)
 
 class Jigglypuff(Pokemon):
     def __init__(self, index):
-        super().__init__("Jigglypuff", Type.NORMAL, 5, 115, 45, 20, 20, "jigglypuff", index)
+        super().__init__("Jigglypuff", Type.NORMAL, 50, 115, 45, 20, 20, "jigglypuff", index)
 
 class Wigglytuff(Pokemon):
     def __init__(self, index):
-        super().__init__("Wigglytuff", Type.NORMAL, 20, 140, 70, 45, 45, "wigglytuff", index)
+        super().__init__("Wigglytuff", Type.NORMAL, 50, 140, 70, 45, 45, "wigglytuff", index)
 
 class Zubat(Pokemon):
     def __init__(self, index):
-        super().__init__("Zubat", Type.POISON, 5, 40, 45, 35, 55, "zubat", index)
+        super().__init__("Zubat", Type.POISON, 50, 40, 45, 35, 55, "zubat", index)
         self.type2 = Type.FLYING
 
 class Golbat(Pokemon):
     def __init__(self, index):
-        super().__init__("Golbat", Type.POISON, 22, 75, 80, 70, 90, "golbat", index)
+        super().__init__("Golbat", Type.POISON, 50, 75, 80, 70, 90, "golbat", index)
         self.type2 = Type.FLYING
 
 class Oddish(Pokemon):
     def __init__(self, index):
-        super().__init__("Oddish", Type.GRASS, 5, 45, 50, 55, 30, "oddish", index)
+        super().__init__("Oddish", Type.GRASS, 50, 45, 50, 55, 30, "oddish", index)
         self.type2 = Type.POISON
 
 class Gloom(Pokemon):
     def __init__(self, index):
-        super().__init__("Gloom", Type.GRASS, 21, 60, 65, 70, 40, "gloom", index)
+        super().__init__("Gloom", Type.GRASS, 50, 60, 65, 70, 40, "gloom", index)
         self.type2 = Type.POISON
 
 class Vileplume(Pokemon):
     def __init__(self, index):
-        super().__init__("Vileplume", Type.GRASS, 36, 75, 80, 85, 50, "vileplume", index)
+        super().__init__("Vileplume", Type.GRASS, 50, 75, 80, 85, 50, "vileplume", index)
         self.type2 = Type.POISON
 
 class Paras(Pokemon):
     def __init__(self, index):
-        super().__init__("Paras", Type.BUG, 5, 35, 70, 55, 25, "paras", index)
+        super().__init__("Paras", Type.BUG, 50, 35, 70, 55, 25, "paras", index)
         self.type2 = Type.GRASS
 
 class Parasect(Pokemon):
     def __init__(self, index):
-        super().__init__("Parasect", Type.BUG, 24, 60, 95, 80, 30, "parasect", index)
+        super().__init__("Parasect", Type.BUG, 50, 60, 95, 80, 30, "parasect", index)
         self.type2 = Type.GRASS
 
 class Venonat(Pokemon):
     def __init__(self, index):
-        super().__init__("Venonat", Type.BUG, 5, 60, 55, 50, 45, "venonat", index)
+        super().__init__("Venonat", Type.BUG, 50, 60, 55, 50, 45, "venonat", index)
         self.type2 = Type.POISON
 
 class Venomoth(Pokemon):
     def __init__(self, index):
-        super().__init__("Venomoth", Type.BUG, 31, 70, 65, 60, 90, "venomoth", index)
+        super().__init__("Venomoth", Type.BUG, 50, 70, 65, 60, 90, "venomoth", index)
         self.type2 = Type.POISON
 
 class Diglett(Pokemon):
     def __init__(self, index):
-        super().__init__("Diglett", Type.GROUND, 5, 10, 55, 25, 95, "diglett", index)
+        super().__init__("Diglett", Type.GROUND, 50, 10, 55, 25, 95, "diglett", index)
 
 class Dugtrio(Pokemon):
     def __init__(self, index):
-        super().__init__("Dugtrio", Type.GROUND, 26, 35, 80, 50, 120, "dugtrio", index)
+        super().__init__("Dugtrio", Type.GROUND, 50, 35, 80, 50, 120, "dugtrio", index)
 
 class Meowth(Pokemon):
     def __init__(self, index):
-        super().__init__("Meowth", Type.NORMAL, 5, 40, 45, 35, 90, "meowth", index)
+        super().__init__("Meowth", Type.NORMAL, 50, 40, 45, 35, 90, "meowth", index)
 
 class Persian(Pokemon):
     def __init__(self, index):
-        super().__init__("Persian", Type.NORMAL, 28, 65, 70, 60, 115, "persian", index)
+        super().__init__("Persian", Type.NORMAL, 50, 65, 70, 60, 115, "persian", index)
 
 class Psyduck(Pokemon):
     def __init__(self, index):
-        super().__init__("Psyduck", Type.WATER, 5, 50, 52, 48, 55, "psyduck", index)
+        super().__init__("Psyduck", Type.WATER, 50, 50, 52, 48, 55, "psyduck", index)
 
 class Golduck(Pokemon):
     def __init__(self, index):
-        super().__init__("Golduck", Type.WATER, 33, 80, 82, 78, 85, "golduck", index)
+        super().__init__("Golduck", Type.WATER, 50, 80, 82, 78, 85, "golduck", index)
 
 class Mankey(Pokemon):
     def __init__(self, index):
-        super().__init__("Mankey", Type.FIGHTING, 5, 40, 80, 35, 70, "mankey", index)
+        super().__init__("Mankey", Type.FIGHTING, 50, 40, 80, 35, 70, "mankey", index)
 
 class Primeape(Pokemon):
     def __init__(self, index):
-        super().__init__("Primeape", Type.FIGHTING, 28, 65, 105, 60, 95, "primeape", index)
+        super().__init__("Primeape", Type.FIGHTING, 50, 65, 105, 60, 95, "primeape", index)
 
 class Growlithe(Pokemon):
     def __init__(self, index):
-        super().__init__("Growlithe", Type.FIRE, 5, 55, 70, 45, 60, "growlithe", index)
+        super().__init__("Growlithe", Type.FIRE, 50, 55, 70, 45, 60, "growlithe", index)
 
 class Arcanine(Pokemon):
     def __init__(self, index):
-        super().__init__("Arcanine", Type.FIRE, 36, 90, 110, 80, 95, "arcanine", index)
+        super().__init__("Arcanine", Type.FIRE, 50, 90, 110, 80, 95, "arcanine", index)
 
 class Poliwag(Pokemon):
     def __init__(self, index):
-        super().__init__("Poliwag", Type.WATER, 5, 40, 50, 40, 90, "poliwag", index)
+        super().__init__("Poliwag", Type.WATER, 50, 40, 50, 40, 90, "poliwag", index)
 
 class Poliwhirl(Pokemon):
     def __init__(self, index):
-        super().__init__("Poliwhirl", Type.WATER, 25, 65, 65, 65, 90, "poliwhirl", index)
+        super().__init__("Poliwhirl", Type.WATER, 50, 65, 65, 65, 90, "poliwhirl", index)
 
 class Poliwrath(Pokemon):
     def __init__(self, index):
-        super().__init__("Poliwrath", Type.WATER, 36, 90, 85, 95, 70, "poliwrath", index)
+        super().__init__("Poliwrath", Type.WATER, 50, 90, 85, 95, 70, "poliwrath", index)
         self.type2 = Type.FIGHTING
 
 class Abra(Pokemon):
     def __init__(self, index):
-        super().__init__("Abra", Type.PSYCHIC, 5, 25, 20, 15, 90, "abra", index)
+        super().__init__("Abra", Type.PSYCHIC, 50, 25, 20, 15, 90, "abra", index)
 
 class Kadabra(Pokemon):
     def __init__(self, index):
-        super().__init__("Kadabra", Type.PSYCHIC, 16, 40, 35, 30, 105, "kadabra", index)
+        super().__init__("Kadabra", Type.PSYCHIC, 50, 40, 35, 30, 105, "kadabra", index)
 
 class Alakazam(Pokemon):
     def __init__(self, index):
-        super().__init__("Alakazam", Type.PSYCHIC, 36, 55, 50, 45, 120, "alakazam", index)
+        super().__init__("Alakazam", Type.PSYCHIC, 50, 55, 50, 45, 120, "alakazam", index)
 
 class Machop(Pokemon):
     def __init__(self, index):
-        super().__init__("Machop", Type.FIGHTING, 5, 70, 80, 50, 35, "machop", index)
+        super().__init__("Machop", Type.FIGHTING, 50, 70, 80, 50, 35, "machop", index)
 
 class Machoke(Pokemon):
     def __init__(self, index):
-        super().__init__("Machoke", Type.FIGHTING, 28, 80, 100, 70, 45, "machoke", index)
+        super().__init__("Machoke", Type.FIGHTING, 50, 80, 100, 70, 45, "machoke", index)
 
 class Machamp(Pokemon):
     def __init__(self, index):
-        super().__init__("Machamp", Type.FIGHTING, 36, 90, 130, 80, 55, "machamp", index)
+        super().__init__("Machamp", Type.FIGHTING, 50, 90, 130, 80, 55, "machamp", index)
 
 class Bellsprout(Pokemon):
     def __init__(self, index):
-        super().__init__("Bellsprout", Type.GRASS, 5, 50, 75, 35, 40, "bellsprout", index)
+        super().__init__("Bellsprout", Type.GRASS, 50, 50, 75, 35, 40, "bellsprout", index)
         self.type2 = Type.POISON
 
 class Weepinbell(Pokemon):
     def __init__(self, index):
-        super().__init__("Weepinbell", Type.GRASS, 21, 65, 90, 50, 55, "weepinbell", index)
+        super().__init__("Weepinbell", Type.GRASS, 50, 65, 90, 50, 55, "weepinbell", index)
         self.type2 = Type.POISON
 
 class Victreebel(Pokemon):
     def __init__(self, index):
-        super().__init__("Victreebel", Type.GRASS, 36, 80, 105, 65, 70, "victreebel", index)
+        super().__init__("Victreebel", Type.GRASS, 50, 80, 105, 65, 70, "victreebel", index)
         self.type2 = Type.POISON
 
 class Tentacool(Pokemon):
     def __init__(self, index):
-        super().__init__("Tentacool", Type.WATER, 5, 40, 40, 35, 70, "tentacool", index)
+        super().__init__("Tentacool", Type.WATER, 50, 40, 40, 35, 70, "tentacool", index)
         self.type2 = Type.POISON
 
 class Tentacruel(Pokemon):
     def __init__(self, index):
-        super().__init__("Tentacruel", Type.WATER, 30, 80, 70, 65, 100, "tentacruel", index)
+        super().__init__("Tentacruel", Type.WATER, 50, 80, 70, 65, 100, "tentacruel", index)
         self.type2 = Type.POISON
 
 class Geodude(Pokemon):
     def __init__(self, index):
-        super().__init__("Geodude", Type.ROCK, 5, 40, 80, 100, 20, "geodude", index)
+        super().__init__("Geodude", Type.ROCK, 50, 40, 80, 100, 20, "geodude", index)
         self.type2 = Type.GROUND
 
 class Graveler(Pokemon):
     def __init__(self, index):
-        super().__init__("Graveler", Type.ROCK, 25, 55, 95, 115, 35, "graveler", index)
+        super().__init__("Graveler", Type.ROCK, 50, 55, 95, 115, 35, "graveler", index)
         self.type2 = Type.GROUND
 
 class Golem(Pokemon):
     def __init__(self, index):
-        super().__init__("Golem", Type.ROCK, 36, 80, 110, 130, 45, "golem", index)
+        super().__init__("Golem", Type.ROCK, 50, 80, 110, 130, 45, "golem", index)
         self.type2 = Type.GROUND
 
 class Ponyta(Pokemon):
     def __init__(self, index):
-        super().__init__("Ponyta", Type.FIRE, 5, 50, 85, 55, 90, "ponyta", index)
+        super().__init__("Ponyta", Type.FIRE, 50, 50, 85, 55, 90, "ponyta", index)
 
 class Rapidash(Pokemon):
     def __init__(self, index):
-        super().__init__("Rapidash", Type.FIRE, 40, 65, 100, 70, 105, "rapidash", index)
+        super().__init__("Rapidash", Type.FIRE, 50, 65, 100, 70, 105, "rapidash", index)
 
 class Slowpoke(Pokemon):
     def __init__(self, index):
-        super().__init__("Slowpoke", Type.WATER, 5, 90, 65, 65, 15, "slowpoke", index)
+        super().__init__("Slowpoke", Type.WATER, 50, 90, 65, 65, 15, "slowpoke", index)
         self.type2 = Type.PSYCHIC
 
 class Slowbro(Pokemon):
     def __init__(self, index):
-        super().__init__("Slowbro", Type.WATER, 37, 95, 75, 110, 30, "slowbro", index)
+        super().__init__("Slowbro", Type.WATER, 50, 95, 75, 110, 30, "slowbro", index)
         self.type2 = Type.PSYCHIC
 
 class Magnemite(Pokemon):
     def __init__(self, index):
-        super().__init__("Magnemite", Type.ELECTRIC, 5, 25, 35, 70, 45, "magnemite", index)
+        super().__init__("Magnemite", Type.ELECTRIC, 50, 25, 35, 70, 45, "magnemite", index)
 
 class Magneton(Pokemon):
     def __init__(self, index):
-        super().__init__("Magneton", Type.ELECTRIC, 30, 50, 60, 95, 70, "magneton", index)
+        super().__init__("Magneton", Type.ELECTRIC, 50, 50, 60, 95, 70, "magneton", index)
 
 class Farfetchd(Pokemon):
     def __init__(self, index):
-        super().__init__("Farfetch'd", Type.NORMAL, 20, 52, 65, 55, 60, "farfetchd", index)
+        super().__init__("Farfetch'd", Type.NORMAL, 50, 52, 65, 55, 60, "farfetchd", index)
         self.type2 = Type.FLYING
 
 class Doduo(Pokemon):
     def __init__(self, index):
-        super().__init__("Doduo", Type.NORMAL, 5, 35, 85, 45, 75, "doduo", index)
+        super().__init__("Doduo", Type.NORMAL, 50, 35, 85, 45, 75, "doduo", index)
         self.type2 = Type.FLYING
 
 class Dodrio(Pokemon):
     def __init__(self, index):
-        super().__init__("Dodrio", Type.NORMAL, 31, 60, 110, 70, 100, "dodrio", index)
+        super().__init__("Dodrio", Type.NORMAL, 50, 60, 110, 70, 100, "dodrio", index)
         self.type2 = Type.FLYING
 
 class Seel(Pokemon):
     def __init__(self, index):
-        super().__init__("Seel", Type.WATER, 5, 65, 45, 55, 45, "seel", index)
+        super().__init__("Seel", Type.WATER, 50, 65, 45, 55, 45, "seel", index)
 
 class Dewgong(Pokemon):
     def __init__(self, index):
-        super().__init__("Dewgong", Type.WATER, 34, 90, 70, 80, 70, "dewgong", index)
+        super().__init__("Dewgong", Type.WATER, 50, 90, 70, 80, 70, "dewgong", index)
         self.type2 = Type.ICE
 
 class Grimer(Pokemon):
     def __init__(self, index):
-        super().__init__("Grimer", Type.POISON, 5, 80, 80, 50, 25, "grimer", index)
+        super().__init__("Grimer", Type.POISON, 50, 80, 80, 50, 25, "grimer", index)
 
 class Muk(Pokemon):
     def __init__(self, index):
-        super().__init__("Muk", Type.POISON, 38, 105, 105, 75, 50, "muk", index)
+        super().__init__("Muk", Type.POISON, 50, 105, 105, 75, 50, "muk", index)
 
 class Shellder(Pokemon):
     def __init__(self, index):
-        super().__init__("Shellder", Type.WATER, 5, 30, 65, 100, 40, "shellder", index)
+        super().__init__("Shellder", Type.WATER, 50, 30, 65, 100, 40, "shellder", index)
 
 class Cloyster(Pokemon):
     def __init__(self, index):
-        super().__init__("Cloyster", Type.WATER, 30, 50, 95, 180, 70, "cloyster", index)
+        super().__init__("Cloyster", Type.WATER, 50, 50, 95, 180, 70, "cloyster", index)
         self.type2 = Type.ICE
 
 class Gastly(Pokemon):
     def __init__(self, index):
-        super().__init__("Gastly", Type.GHOST, 5, 30, 35, 30, 80, "gastly", index)
+        super().__init__("Gastly", Type.GHOST, 50, 30, 35, 30, 80, "gastly", index)
         self.type2 = Type.POISON
 
 class Haunter(Pokemon):
     def __init__(self, index):
-        super().__init__("Haunter", Type.GHOST, 25, 45, 50, 45, 95, "haunter", index)
+        super().__init__("Haunter", Type.GHOST, 50, 45, 50, 45, 95, "haunter", index)
         self.type2 = Type.POISON
 
 class Gengar(Pokemon):
     def __init__(self, index):
-        super().__init__("Gengar", Type.GHOST, 38, 60, 65, 60, 110, "gengar", index)
+        super().__init__("Gengar", Type.GHOST, 50, 60, 65, 60, 110, "gengar", index)
         self.type2 = Type.POISON
 
 class Onix(Pokemon):
     def __init__(self, index):
-        super().__init__("Onix", Type.ROCK, 30, 35, 45, 160, 70, "onix", index)
+        super().__init__("Onix", Type.ROCK, 50, 35, 45, 160, 70, "onix", index)
         self.type2 = Type.GROUND
 
 class Drowzee(Pokemon):
     def __init__(self, index):
-        super().__init__("Drowzee", Type.PSYCHIC, 5, 60, 48, 45, 42, "drowzee", index)
+        super().__init__("Drowzee", Type.PSYCHIC, 50, 60, 48, 45, 42, "drowzee", index)
 
 class Hypno(Pokemon):
     def __init__(self, index):
-        super().__init__("Hypno", Type.PSYCHIC, 26, 85, 73, 70, 67, "hypno", index)
+        super().__init__("Hypno", Type.PSYCHIC, 50, 85, 73, 70, 67, "hypno", index)
 
 class Krabby(Pokemon):
     def __init__(self, index):
-        super().__init__("Krabby", Type.WATER, 5, 30, 105, 90, 50, "krabby", index)
+        super().__init__("Krabby", Type.WATER, 50, 30, 105, 90, 50, "krabby", index)
 
 class Kingler(Pokemon):
     def __init__(self, index):
-        super().__init__("Kingler", Type.WATER, 28, 55, 130, 115, 75, "kingler", index)
+        super().__init__("Kingler", Type.WATER, 50, 55, 130, 115, 75, "kingler", index)
 
 class Voltorb(Pokemon):
     def __init__(self, index):
-        super().__init__("Voltorb", Type.ELECTRIC, 5, 40, 30, 50, 100, "voltorb", index)
+        super().__init__("Voltorb", Type.ELECTRIC, 50, 40, 30, 50, 100, "voltorb", index)
 
 class Electrode(Pokemon):
     def __init__(self, index):
-        super().__init__("Electrode", Type.ELECTRIC, 30, 60, 50, 70, 140, "electrode", index)
+        super().__init__("Electrode", Type.ELECTRIC, 50, 60, 50, 70, 140, "electrode", index)
 
 class Exeggcute(Pokemon):
     def __init__(self, index):
-        super().__init__("Exeggcute", Type.GRASS, 5, 60, 40, 80, 40, "exeggcute", index)
+        super().__init__("Exeggcute", Type.GRASS, 50, 60, 40, 80, 40, "exeggcute", index)
         self.type2 = Type.PSYCHIC
 
 class Exeggutor(Pokemon):
     def __init__(self, index):
-        super().__init__("Exeggutor", Type.GRASS, 36, 95, 95, 85, 55, "exeggutor", index)
+        super().__init__("Exeggutor", Type.GRASS, 50, 95, 95, 85, 55, "exeggutor", index)
         self.type2 = Type.PSYCHIC
 
 class Cubone(Pokemon):
     def __init__(self, index):
-        super().__init__("Cubone", Type.GROUND, 5, 50, 50, 95, 35, "cubone", index)
+        super().__init__("Cubone", Type.GROUND, 50, 50, 50, 95, 35, "cubone", index)
 
 class Marowak(Pokemon):
     def __init__(self, index):
-        super().__init__("Marowak", Type.GROUND, 28, 60, 80, 110, 45, "marowak", index)
+        super().__init__("Marowak", Type.GROUND, 50, 60, 80, 110, 45, "marowak", index)
 
 class Hitmonlee(Pokemon):
     def __init__(self, index):
-        super().__init__("Hitmonlee", Type.FIGHTING, 30, 50, 120, 53, 87, "hitmonlee", index)
+        super().__init__("Hitmonlee", Type.FIGHTING, 50, 50, 120, 53, 87, "hitmonlee", index)
 
 class Hitmonchan(Pokemon):
     def __init__(self, index):
         super().__init__("Hitmonchan", Type.FIGHTING, 50, 50, 105, 79, 76, "hitmonchan", index)
-        self.moves.append(RollingKick())
 
 class Lickitung(Pokemon):
     def __init__(self, index):
-        super().__init__("Lickitung", Type.NORMAL, 5, 90, 55, 75, 30, "lickitung", index)
+        super().__init__("Lickitung", Type.NORMAL, 50, 90, 55, 75, 30, "lickitung", index)
 
 class Koffing(Pokemon):
     def __init__(self, index):
-        super().__init__("Koffing", Type.POISON, 5, 40, 65, 95, 35, "koffing", index)
+        super().__init__("Koffing", Type.POISON, 50, 40, 65, 95, 35, "koffing", index)
 
 class Weezing(Pokemon):
     def __init__(self, index):
-        super().__init__("Weezing", Type.POISON, 35, 65, 90, 120, 60, "weezing", index)
+        super().__init__("Weezing", Type.POISON, 50, 65, 90, 120, 60, "weezing", index)
 
 class Rhyhorn(Pokemon):
     def __init__(self, index):
-        super().__init__("Rhyhorn", Type.GROUND, 5, 80, 85, 95, 25, "rhyhorn", index)
+        super().__init__("Rhyhorn", Type.GROUND, 50, 80, 85, 95, 25, "rhyhorn", index)
         self.type2 = Type.ROCK
 
 class Rhydon(Pokemon):
     def __init__(self, index):
-        super().__init__("Rhydon", Type.GROUND, 42, 105, 130, 120, 40, "rhydon", index)
+        super().__init__("Rhydon", Type.GROUND, 50, 105, 130, 120, 40, "rhydon", index)
         self.type2 = Type.ROCK
 
 class Chansey(Pokemon):
     def __init__(self, index):
-        super().__init__("Chansey", Type.NORMAL, 5, 250, 5, 5, 50, "chansey", index)
+        super().__init__("Chansey", Type.NORMAL, 50, 250, 5, 5, 50, "chansey", index)
 
 class Tangela(Pokemon):
     def __init__(self, index):
-        super().__init__("Tangela", Type.GRASS, 5, 65, 55, 115, 60, "tangela", index)
+        super().__init__("Tangela", Type.GRASS, 50, 65, 55, 115, 60, "tangela", index)
 
 class Kangaskhan(Pokemon):
     def __init__(self, index):
-        super().__init__("Kangaskhan", Type.NORMAL, 35, 105, 95, 80, 90, "kangaskhan", index)
+        super().__init__("Kangaskhan", Type.NORMAL, 50, 105, 95, 80, 90, "kangaskhan", index)
 
 class Horsea(Pokemon):
     def __init__(self, index):
-        super().__init__("Horsea", Type.WATER, 5, 30, 40, 70, 60, "horsea", index)
+        super().__init__("Horsea", Type.WATER, 50, 30, 40, 70, 60, "horsea", index)
 
 class Seadra(Pokemon):
     def __init__(self, index):
-        super().__init__("Seadra", Type.WATER, 32, 55, 65, 95, 85, "seadra", index)
+        super().__init__("Seadra", Type.WATER, 50, 55, 65, 95, 85, "seadra", index)
 
 class Goldeen(Pokemon):
     def __init__(self, index):
-        super().__init__("Goldeen", Type.WATER, 5, 45, 67, 60, 63, "goldeen", index)
+        super().__init__("Goldeen", Type.WATER, 50, 45, 67, 60, 63, "goldeen", index)
 
 class Seaking(Pokemon):
     def __init__(self, index):
-        super().__init__("Seaking", Type.WATER, 33, 80, 92, 65, 68, "seaking", index)
+        super().__init__("Seaking", Type.WATER, 50, 80, 92, 65, 68, "seaking", index)
 
 class Staryu(Pokemon):
     def __init__(self, index):
-        super().__init__("Staryu", Type.WATER, 5, 30, 45, 55, 85, "staryu", index)
+        super().__init__("Staryu", Type.WATER, 50, 30, 45, 55, 85, "staryu", index)
 
 class Starmie(Pokemon):
     def __init__(self, index):
-        super().__init__("Starmie", Type.WATER, 30, 60, 75, 85, 115, "starmie", index)
+        super().__init__("Starmie", Type.WATER, 50, 60, 75, 85, 115, "starmie", index)
         self.type2 = Type.PSYCHIC
 
 class Mrmime(Pokemon):
     def __init__(self, index):
-        super().__init__("Mr. Mime", Type.PSYCHIC, 20, 40, 45, 65, 90, "mr-mime", index)
+        super().__init__("Mr. Mime", Type.PSYCHIC, 50, 40, 45, 65, 90, "mr-mime", index)
 
 class Scyther(Pokemon):
     def __init__(self, index):
-        super().__init__("Scyther", Type.BUG, 25, 70, 110, 80, 105, "scyther", index)
+        super().__init__("Scyther", Type.BUG, 50, 70, 110, 80, 105, "scyther", index)
         self.type2 = Type.FLYING
 
 class Jynx(Pokemon):
     def __init__(self, index):
-        super().__init__("Jynx", Type.ICE, 20, 65, 50, 35, 95, "jynx", index)
+        super().__init__("Jynx", Type.ICE, 50, 65, 50, 35, 95, "jynx", index)
         self.type2 = Type.PSYCHIC
 
 class Electabuzz(Pokemon):
     def __init__(self, index):
-        super().__init__("Electabuzz", Type.ELECTRIC, 30, 65, 83, 57, 105, "electabuzz", index)
+        super().__init__("Electabuzz", Type.ELECTRIC, 50, 65, 83, 57, 105, "electabuzz", index)
 
 class Magmar(Pokemon):
     def __init__(self, index):
-        super().__init__("Magmar", Type.FIRE, 30, 65, 95, 57, 93, "magmar", index)
+        super().__init__("Magmar", Type.FIRE, 50, 65, 95, 57, 93, "magmar", index)
 
 class Pinsir(Pokemon):
     def __init__(self, index):
-        super().__init__("Pinsir", Type.BUG, 25, 65, 125, 100, 85, "pinsir", index)
+        super().__init__("Pinsir", Type.BUG, 50, 65, 125, 100, 85, "pinsir", index)
 
 class Tauros(Pokemon):
     def __init__(self, index):
-        super().__init__("Tauros", Type.NORMAL, 20, 75, 100, 95, 110, "tauros", index)
+        super().__init__("Tauros", Type.NORMAL, 50, 75, 100, 95, 110, "tauros", index)
 
 class Magikarp(Pokemon):
     def __init__(self, index):
-        super().__init__("Magikarp", Type.WATER, 5, 20, 10, 55, 80, "magikarp", index)
+        super().__init__("Magikarp", Type.WATER, 50, 20, 10, 55, 80, "magikarp", index)
 
 class Gyarados(Pokemon):
     def __init__(self, index):
-        super().__init__("Gyarados", Type.WATER, 20, 95, 125, 79, 81, "gyarados", index)
+        super().__init__("Gyarados", Type.WATER, 50, 95, 125, 79, 81, "gyarados", index)
         self.type2 = Type.FLYING
 
 class Lapras(Pokemon):
     def __init__(self, index):
-        super().__init__("Lapras", Type.WATER, 30, 130, 85, 80, 60, "lapras", index)
+        super().__init__("Lapras", Type.WATER, 50, 130, 85, 80, 60, "lapras", index)
         self.type2 = Type.ICE
 
 class Ditto(Pokemon):
     def __init__(self, index):
-        super().__init__("Ditto", Type.NORMAL, 5, 48, 48, 48, 48, "ditto", index)
+        super().__init__("Ditto", Type.NORMAL, 50, 48, 48, 48, 48, "ditto", index)
 
 class Eevee(Pokemon):
     def __init__(self, index):
-        super().__init__("Eevee", Type.NORMAL, 5, 55, 55, 50, 55, "eevee", index)
+        super().__init__("Eevee", Type.NORMAL, 50, 55, 55, 50, 55, "eevee", index)
 
 class Vaporeon(Pokemon):
     def __init__(self, index):
-        super().__init__("Vaporeon", Type.WATER, 36, 130, 65, 60, 65, "vaporeon", index)
+        super().__init__("Vaporeon", Type.WATER, 50, 130, 65, 60, 65, "vaporeon", index)
 
 class Jolteon(Pokemon):
     def __init__(self, index):
-        super().__init__("Jolteon", Type.ELECTRIC, 36, 65, 65, 60, 130, "jolteon", index)
+        super().__init__("Jolteon", Type.ELECTRIC, 50, 65, 65, 60, 130, "jolteon", index)
 
 class Flareon(Pokemon):
     def __init__(self, index):
-        super().__init__("Flareon", Type.FIRE, 36, 65, 130, 60, 65, "flareon", index)
+        super().__init__("Flareon", Type.FIRE, 50, 65, 130, 60, 65, "flareon", index)
 
 class Porygon(Pokemon):
     def __init__(self, index):
-        super().__init__("Porygon", Type.NORMAL, 5, 65, 60, 70, 40, "porygon", index)
+        super().__init__("Porygon", Type.NORMAL, 50, 65, 60, 70, 40, "porygon", index)
 
 class Omanyte(Pokemon):
     def __init__(self, index):
-        super().__init__("Omanyte", Type.ROCK, 5, 35, 40, 100, 35, "omanyte", index)
+        super().__init__("Omanyte", Type.ROCK, 50, 35, 40, 100, 35, "omanyte", index)
         self.type2 = Type.WATER
 
 class Omastar(Pokemon):
     def __init__(self, index):
-        super().__init__("Omastar", Type.ROCK, 40, 70, 60, 125, 55, "omastar", index)
+        super().__init__("Omastar", Type.ROCK, 50, 70, 60, 125, 55, "omastar", index)
         self.type2 = Type.WATER
 
 class Kabuto(Pokemon):
     def __init__(self, index):
-        super().__init__("Kabuto", Type.ROCK, 5, 30, 80, 90, 55, "kabuto", index)
+        super().__init__("Kabuto", Type.ROCK, 50, 30, 80, 90, 55, "kabuto", index)
         self.type2 = Type.WATER
 
 class Kabutops(Pokemon):
     def __init__(self, index):
-        super().__init__("Kabutops", Type.ROCK, 40, 60, 115, 105, 80, "kabutops", index)
+        super().__init__("Kabutops", Type.ROCK, 50, 60, 115, 105, 80, "kabutops", index)
         self.type2 = Type.WATER
 
 class Aerodactyl(Pokemon):
     def __init__(self, index):
-        super().__init__("Aerodactyl", Type.ROCK, 40, 80, 105, 65, 130, "aerodactyl", index)
+        super().__init__("Aerodactyl", Type.ROCK, 50, 80, 105, 65, 130, "aerodactyl", index)
         self.type2 = Type.FLYING
 
 class Snorlax(Pokemon):
     def __init__(self, index):
-        super().__init__("Snorlax", Type.NORMAL, 30, 160, 110, 65, 30, "snorlax", index)
+        super().__init__("Snorlax", Type.NORMAL, 50, 160, 110, 65, 30, "snorlax", index)
 
 class Articuno(Pokemon):
     def __init__(self, index):
@@ -988,33 +986,28 @@ class Moltres(Pokemon):
 
 class Dratini(Pokemon):
     def __init__(self, index):
-        super().__init__("Dratini", Type.DRAGON, 5, 41, 64, 45, 50, "dratini", index)
+        super().__init__("Dratini", Type.DRAGON, 50, 41, 64, 45, 50, "dratini", index)
 
 class Dragonair(Pokemon):
     def __init__(self, index):
-        super().__init__("Dragonair", Type.DRAGON, 30, 61, 84, 65, 70, "dragonair", index)
+        super().__init__("Dragonair", Type.DRAGON, 50, 61, 84, 65, 70, "dragonair", index)
 
 class Dragonite(Pokemon):
     def __init__(self, index):
-        super().__init__("Dragonite", Type.DRAGON, 55, 91, 134, 95, 80, "dragonite", index)
+        super().__init__("Dragonite", Type.DRAGON, 50, 91, 134, 95, 80, "dragonite", index)
         self.type2 = Type.FLYING
 
 class Mewtwo(Pokemon):
     def __init__(self, index):
-        super().__init__("Mewtwo", Type.PSYCHIC, 70, 106, 110, 90, 130, "mewtwo", index)
-
+        super().__init__("Mewtwo", Type.PSYCHIC, 50, 106, 110, 90, 130, "mewtwo", index)
 
 class Mew(Pokemon):
     def __init__(self, index):
-        super().__init__("Mew", Type.PSYCHIC, 70, 100, 100, 100, 100, "mew", index)
-        self.moves.append(Rest())
-        self.moves.append(HighJumpKick())
-        self.moves.append(PetalDance())
-        self.moves.append(TestMove())
+        super().__init__("Mew", Type.PSYCHIC, 50, 100, 100, 100, 100, "mew", index)
 
 
+#All Gen 1 Moves From https://pokemondb.net/move/generation/1
 ######################################################################################################################################################################
-
 
 #Fire Moves
 class WillOWisp(StatusMove):
@@ -1273,7 +1266,7 @@ class Rest(StatusMove):
 #Ice Moves
 class PowderSnow(StatusMove):
     def __init__(self):
-        super().__init__("Powder Snow", Type.ICE, 40, 25, Status.NONE)
+        super().__init__("Powder Snow", Type.ICE, 40, 100, 25, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -1366,7 +1359,7 @@ class Peck(Move):
     def __init__(self):
         super().__init__("Peck", Type.FLYING, 35, 35)
 
-class SkyAttack(StatusMove): #TODO two turn attack and causes flinching
+class SkyAttack(StatusMove): #TODO two turn attack and has a chance to causes flinching
     def __init__(self):
         super().__init__("Sky Attack", Type.FLYING, 140, 90, 5, Status.NONE)
 
@@ -1482,9 +1475,9 @@ class DoubleKick(MultiHitMoves):
     def __init__(self):
         super().__init__("Double Kick", Type.FIGHTING, 30, 100, 30, 2)
 
-class HighJumpKick(StatusMove):#TODO should cause damage to itself if misses
+class HighJumpKick(StatusMove):
     def __init__(self):
-        super().__init__("Double Kick", Type.FIGHTING, 130, 50, 30, Status.NONE)
+        super().__init__("Double Kick", Type.FIGHTING, 130, 90, 30, Status.NONE)
 
     def use(self, user, target):
         if(user.status == Status.SLEEP or user.status == Status.FROZEN or user.status == Status.FLINCH):
@@ -1512,9 +1505,9 @@ class HighJumpKick(StatusMove):#TODO should cause damage to itself if misses
             user.current_health -= user.max_health // 2
             return Status.NONE
 
-class JumpKick(StatusMove):#TODO should cause damage to itself if misses
+class JumpKick(StatusMove):
     def __init__(self):
-        super().__init__("Double Kick", Type.FIGHTING, 100, 95, 30, Status.NONE)
+        super().__init__("Jump Kick", Type.FIGHTING, 100, 95, 30, Status.NONE)
     
     def use(self, user, target):
         if(user.status == Status.SLEEP or user.status == Status.FROZEN or user.status == Status.FLINCH):
@@ -1557,10 +1550,388 @@ class SeismicToss(Move):
     def use(self, user, target):
         self.damage = user.level
         super().use(user, target)
+
+class Submission(StatusMove):
+    def __init__(self):
+        super().__init__("Submission", Type.FIGHTING, 80, 80, 20, Status.NONE)
+    
+    def use(self, user, target):
+        if(user.status == Status.SLEEP or user.status == Status.FROZEN or user.status == Status.FLINCH):
+            return self.check_status(user)
+        elif(user.status == Status.PARALYSIS):
+            if random.randint(1, 100) < 25:
+                Game.set_text(user.name + " is Paralyzed")
+                return Status.PARALYSIS
+        
+        if random.randint(1, 100) <= self.accuracy:   
+            Game.set_text(user.name + " used " + self.name + " on " + target.name)
+            if self.type == user.type:
+                stab = 1.5
+            else:
+                stab = 1
+            first_damage = int((((((2 * user.level)//5) + 2) * self.damage * (user.attack // user.defense)) // 50))
+            total_damage = int(first_damage * stab * (Type.effectiveness[self.type][target.type] * Type.effectiveness[self.type][target.type2]))
+            if user.status == Status.BURN:
+                total_damage //= 2
+            target.take_damage(total_damage)
+            user.take_damage(total_damage // 4)
+            self.current_uses -= 1
+            return Status.NONE
+        else:
+            return Status.NONE
+
 ######################################################################################################################################################################
 
 #Normal Moves
+class Barrage(MultiHitMoves):
+    def __init__(self):
+        super().__init__("Barrage", Type.NORMAL, 15, 85, 20, random.randint(2, 5))
 
+class Bind(StatusMove):
+    def __init__(self):
+        super().__init__("Bind", Type.NORMAL, 15, 85, 20, Status.WATERBURN)
+    
+    def use(self, user, target):
+        super().use(user, target)
+        target.water_burn = 5
+
+class BodySlam(StatusMove):
+    def __init__(self):
+        super().__init__("Body Slam", Type.NORMAL, 85, 100, 15, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 30:
+            target.set_status(Status.PARALYSIS)
+        return result
+
+class Barrage(MultiHitMoves):
+    def __init__(self):
+        super().__init__("Barrage", Type.NORMAL, 18, 85, 20, random.randint(2, 5))
+
+class Constrict(Move):
+    def __init__(self):
+        super().__init__("Constrict", Type.NORMAL, 10, 35)
+
+class Cut(Move):
+    def __init__(self):
+        self.accuracy = 95
+        super().__init__("Cut", Type.NORMAL, 50, 30)
+
+class DizzyPunch(StatusMove):
+    def __init__(self):
+        super().__init__("Dizzy Punch", Type.NORMAL, 70, 100, 10, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 20:
+            target.set_status(Status.CONFUSION)
+        return result
+
+class DoubleSlap(MultiHitMoves):
+    def __init__(self):
+        super().__init__("Double Slap", Type.NORMAL, 15, 85, 20, random.randint(2, 5))
+
+class DoubleEdge(StatusMove):
+    def __init__(self):
+        super().__init__("Double-Edge", Type.NORMAL, 120, 100, 15, Status.NONE)
+    
+    def use(self, user, target):
+        if(user.status == Status.SLEEP or user.status == Status.FROZEN or user.status == Status.FLINCH):
+            return self.check_status(user)
+        elif(user.status == Status.PARALYSIS):
+            if random.randint(1, 100) < 25:
+                Game.set_text(user.name + " is Paralyzed")
+                return Status.PARALYSIS
+        
+        if random.randint(1, 100) <= self.accuracy:   
+            Game.set_text(user.name + " used " + self.name + " on " + target.name)
+            if self.type == user.type:
+                stab = 1.5
+            else:
+                stab = 1
+            first_damage = int((((((2 * user.level)//5) + 2) * self.damage * (user.attack // user.defense)) // 50))
+            total_damage = int(first_damage * stab * (Type.effectiveness[self.type][target.type] * Type.effectiveness[self.type][target.type2]))
+            if user.status == Status.BURN:
+                total_damage //= 2
+            target.take_damage(total_damage)
+            user.take_damage(total_damage // 3)
+            self.current_uses -= 1
+            return Status.NONE
+        else:
+            return Status.NONE
+
+class EggBomb(Move):
+    def __init__(self):
+        self.accuracy = 75
+        super().__init__("Egg Bomb", Type.NORMAL, 100, 10)
+
+class Explosion(Move):
+    def __init__(self):
+        super().__init__("Explosion", Type.NORMAL, 250, 10)
+    
+    def use(self, user, target):
+        super().use(user, target)
+        user.current_health -= 10000000
+
+class FuryAttack(MultiHitMoves):
+    def __init__(self):
+        super().__init__("Furry Attack", Type.NORMAL, 15, 85, 20, random.randint(2, 5))
+
+class FurySwipe(MultiHitMoves):
+    def __init__(self):
+        super().__init__("Furry Swipe", Type.NORMAL, 18, 85, 15, random.randint(2, 5))
+
+class Glare(StatusMove):
+    def __init__(self):
+        super().__init__("Glare", Type.NORMAL, 0, 100, 30, Status.PARALYSIS)
+
+class Guillotine(StatusMove):
+    def __init__(self):
+        super().__init__("Guillotine", Type.NORMAL, 1000000000, 30, 5, Status.NONE)
+
+class Headbutt(FlinchingMoves):
+    def __init__(self):
+        super().__init__("Headbutt", Type.NORMAL, 70, 100, 15, 30)
+
+class HornAttack(Move):
+    def __init__(self):
+        self.accuracy = 75
+        super().__init__("Horn Attack", Type.NORMAL, 65, 25)
+
+class HornDrill(StatusMove):
+    def __init__(self):
+        super().__init__("Horn Drill", Type.NORMAL, 1000000000, 30, 5, Status.NONE)
+
+class HyperBeam(Move): #TODO needs to recharge for 1 round
+    def __init__(self):
+        self.accuracy = 90
+        super().__init__("Hyper Beam", Type.NORMAL, 150, 5)
+
+class HyperFang(FlinchingMoves):
+    def __init__(self):
+        super().__init__("Hyper Fang", Type.NORMAL, 80, 90, 15, 10)
+
+class LovelyKiss(StatusMove):
+    def __init__(self):
+        super().__init__("Lovely Kiss", Type.GRASS, 0, 75, 15, Status.SLEEP)
+
+class MegaKick(Move):
+    def __init__(self):
+        self.accuracy = 75
+        super().__init__("Mega Kick", Type.NORMAL, 120, 5)
+
+class MegaPunch(Move):
+    def __init__(self):
+        self.accuracy = 85
+        super().__init__("Mega Punch", Type.NORMAL, 80, 5)
+
+class PayDay(Move):
+    def __init__(self):
+        super().__init__("Pay Day", Type.NORMAL, 40, 20)
+
+class Pound(Move):
+    def __init__(self):
+        super().__init__("Pound", Type.NORMAL, 40, 35)
+
+class QuickAttack(Move):
+    def __init__(self):
+        self.priority = 1
+        super().__init__("Quick Attack", Type.NORMAL, 40, 30)
+
+class Rage(Move):
+    def __init__(self):
+        super().__init__("Rage", Type.NORMAL, 20, 20)
+
+class RazorWind(Move):
+    def __init__(self): #TODO Charge up Attack
+        super().__init__("Razor Wind", Type.NORMAL, 80, 10)
+
+class Recover(StatusMove):
+    def __init__(self):
+        super().__init__("Recover", Type.NORMAL, 0, 100, 5, Status.NONE)
+    
+    def use(self, user, target):
+        user.current_health =+ user.max_health // 2
+
+class Scratch(Move):
+    def __init__(self):
+        super().__init__("Scratch", Type.NORMAL, 40, 35)
+
+class SelfDestruct(Move):
+    def __init__(self):
+        super().__init__("Self Destruct", Type.NORMAL, 200, 5)
+    
+    def use(self, user, target):
+        super().use(user, target)
+        user.current_health -= 10000000
+
+class Sing(StatusMove):
+    def __init__(self):
+        super().__init__("Sing", Type.NORMAL, 0, 55, 15, Status.SLEEP)
+
+class Slam(Move):
+    def __init__(self):
+        self.accuracy = 75
+        super().__init__("Slam", Type.NORMAL, 80, 20)
+
+class Slash(Move):
+    def __init__(self):
+        super().__init__("Slam", Type.NORMAL, 70, 20)
+
+class SoftBoiled(StatusMove):
+    def __init__(self):
+        super().__init__("Soft Boiled", Type.NORMAL, 0, 100, 5, Status.NONE)
+    
+    def use(self, user, target):
+        user.current_health =+ user.max_health // 2
+
+class SonicBoom(Move):
+    def __init__(self):
+        super().__init__("Sonic Boom", Type.NORMAL, 0, 20)
+    
+    def use(self, user, target):
+        if(user.status == Status.SLEEP or user.status == Status.FROZEN or user.status == Status.FLINCH):
+            return self.check_status(user)
+        elif(user.status == Status.PARALYSIS):
+            if random.randint(1, 100) < 25:
+                Game.set_text(user.name + " is Paralyzed")
+                return Status.PARALYSIS
+            
+        Game.set_text(user.name + " used " + self.name + " on " + target.name)
+        target.take_damage(20)
+        self.current_uses -= 1
+        return Status.NONE
+    
+class SpikeCannon(MultiHitMoves):
+    def __init__(self):
+        super().__init__("Spike Cannon", Type.NORMAL, 20, 100, 15, random.randint(2, 5))
+
+class Stomp(FlinchingMoves):
+    def __init__(self):
+        super().__init__("Stomp", Type.NORMAL, 65, 100, 20, 30)
+
+class Strength(Move):
+    def __init__(self):
+        super().__init__("Strength", Type.NORMAL, 80, 15)
+
+class SuperFang(Move):
+    def __init__(self):
+        super().__init__("Super Fang", Type.NORMAL, 0, 10)
+    
+    def use(self, user, target):
+        if(user.status == Status.SLEEP or user.status == Status.FROZEN or user.status == Status.FLINCH):
+            return self.check_status(user)
+        elif(user.status == Status.PARALYSIS):
+            if random.randint(1, 100) < 25:
+                Game.set_text(user.name + " is Paralyzed")
+                return Status.PARALYSIS
+            
+        Game.set_text(user.name + " used " + self.name + " on " + target.name)
+        target.take_damage(target.current_health // 2)
+        self.current_uses -= 1
+        return Status.NONE
+
+class Supersonic(StatusMove):
+    def __init__(self):
+        super().__init__("SuperSonic", Type.NORMAL, 0, 55, 25, Status.CONFUSION)
+    
+class Swift(Move):
+    def __init__(self):
+        super().__init__("Swift", Type.NORMAL, 60, 20)
+
+class Tackle(Move):
+    def __init__(self):
+        super().__init__("Scratch", Type.NORMAL, 40, 35)
+
+class TakeDown(StatusMove):
+    def __init__(self):
+        super().__init__("Take Down", Type.NORMAL, 90, 85, 20, Status.NONE)
+    
+    def use(self, user, target):
+        if(user.status == Status.SLEEP or user.status == Status.FROZEN or user.status == Status.FLINCH):
+            return self.check_status(user)
+        elif(user.status == Status.PARALYSIS):
+            if random.randint(1, 100) < 25:
+                Game.set_text(user.name + " is Paralyzed")
+                return Status.PARALYSIS
+        
+        if random.randint(1, 100) <= self.accuracy:   
+            Game.set_text(user.name + " used " + self.name + " on " + target.name)
+            if self.type == user.type:
+                stab = 1.5
+            else:
+                stab = 1
+            first_damage = int((((((2 * user.level)//5) + 2) * self.damage * (user.attack // user.defense)) // 50))
+            total_damage = int(first_damage * stab * (Type.effectiveness[self.type][target.type] * Type.effectiveness[self.type][target.type2]))
+            if user.status == Status.BURN:
+                total_damage //= 2
+            target.take_damage(total_damage)
+            user.take_damage(total_damage // 4)
+            self.current_uses -= 1
+            return Status.NONE
+        else:
+            return Status.NONE
+
+class Thrash(MultiHitMoves):
+    def __init__(self):
+        super().__init__("Thrash", Type.GRASS, 120, 100, 10, 3)
+    
+    def use(self, user, target):
+        super().use(user, target)
+        user.set_status(Status.CONFUSION)
+
+class TriAttack(StatusMove):
+    def __init__(self):
+        super().__init__("Tri Attack", Type.NORMAL, 80, 100, 10, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 20:
+            x = random.randint(1, 100)
+            if x <= 33:
+                target.set_status(Status.PARALYSIS)
+            elif 33 < x <= 66:
+                target.set_status(Status.BURN)
+            else:
+                target.set_status(Status.FROZEN)
+        return result
+
+class ViseGrip(Move):
+    def __init__(self):
+        super().__init__("Vise Grip", Type.NORMAL, 55, 30)
+
+class Wrap(StatusMove):
+    def __init__(self):
+        super().__init__("Wrap", Type.NORMAL, 15, 90, 20, Status.WATERBURN)
+######################################################################################################################################################################
+
+#Bug Moves
+class Twineedle(MultiHitMoves):
+    def __init__(self):
+        super().__init__("Twineedle", Type.BUG, 25, 100, 20, 2)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 20 and (target.type != Type.POISON and target.type2 != Type.POISON):
+            target.set_status(Status.POISON)
+        return result
+
+class PinMissile(MultiHitMoves):
+    def __init__(self):
+        super().__init__("Pin Missile", Type.BUG, 25, 95, 20, random.randint(2, 5))
+
+class LeechLife(AbsorptionMove):
+    def __init__(self):
+        super().__init__("Leech Life", Type.BUG, 80, 100, 10)
 
 ######################################################################################################################################################################
 
@@ -1682,9 +2053,10 @@ class StatusLabel():
 
 pygame.init()
 BUTTON_PRESSED = pygame.event.custom_type()
-screen = pygame.display.set_mode((1000, 1000))
+screen = pygame.display.set_mode((1920, 1080))
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Calibri", 30)
+
 
 
 class ResolveParams:
@@ -1781,23 +2153,82 @@ class Game:
             Mew(1)
 ]
 
-        # for p1 in range(6):
-        #     randPick = random.randint(0, 150)
-        #     self.players[0].add_pokemon(AllP1Pokemon[randPick])
-        #     print(0)
-        # for p2 in range(6):
-        #     randPick = random.randint(0, 150)
-        #     self.players[1].add_pokemon(AllP2Pokemon[randPick])
-        #     print(1)
+        AllPokemonMoves = [
+            # Fire
+            WillOWisp(), Ember(), FireBlast(), FireSpin(), FirePunch(), Flamethrower(),
+            
+            # Electric
+            ThunderWave(), Thunderbolt(), ThunderShock(), ThunderPunch(), Thunder(),
+            
+            # Poison
+            Acid(), Toxic(), PoisonGas(), PoisonPowder(), Smog(), Sludge(), PosionSting(),
+            
+            # Water
+            WaterGun(), Waterfall(), Surf(), HydroPump(), Crabhammer(), Clamp(), Bubble(), BubbleBeam(),
+            
+            # Psychic
+            Psychic(), Confusion(), Hypnosis(), Psybeam(), Rest(),
+            
+            # Ice
+            PowderSnow(), Blizzard(), Haze(), IceBeam(), IcePunch(),
+            
+            # Ground
+            Earthquake(), Fissure(), BoneClub(), Bonemerang(), Dig(),
+            
+            # Flying
+            DrillPeck(), Fly(), Gust(), Peck(), SkyAttack(), WingAttack(),
+            
+            # Rock
+            RockSlide(), RockThrow(),
+            
+            # Ghost
+            Lick(), ConfuseRay(), NightShade(),
+            
+            # Dragon
+            DragonRage(),
+            
+            # Dark
+            Bite(),
+            
+            # Grass
+            Absorb(), MegaDrain(), RazorLeaf(), SleepPowder(), VineWhip(), PetalDance(), Spore(), StunSpore(), SolarBeam(),
+            
+            # Fighting
+            DoubleKick(), HighJumpKick(), JumpKick(), karateChop(), RollingKick(), SeismicToss(), Submission(),
+            
+            # Normal
+            Barrage(), Bind(), BodySlam(), Constrict(), Cut(), DizzyPunch(), DoubleSlap(), DoubleEdge(),
+            EggBomb(), Explosion(), FuryAttack(), FurySwipe(), Glare(), Guillotine(), Headbutt(),
+            HornAttack(), HornDrill(), HyperBeam(), HyperFang(), LovelyKiss(), MegaKick(), MegaPunch(),
+            PayDay(), Pound(), QuickAttack(), Rage(), RazorWind(), Recover(), Scratch(), SelfDestruct(),
+            Sing(), Slam(), Slash(), SoftBoiled(), SonicBoom(), SpikeCannon(), Stomp(), Strength(),
+            SuperFang(), Supersonic(), Swift(), Tackle(), TakeDown(), Thrash(), TriAttack(), ViseGrip(), Wrap(),
+            
+            # Bug
+            Twineedle(), PinMissile(), LeechLife()
+        ]
 
-        self.players[0].add_pokemon(Mew(0))
-        self.players[0].add_pokemon(Mew(0))
-        self.players[1].add_pokemon(Mew(1))
-        self.players[1].add_pokemon(Mew(1))
+        for p1 in range(6):
+            randPick = random.randint(0, 150)
+            self.players[0].add_pokemon(AllP1Pokemon[randPick])
+            for move in range(4):
+                randMovePick = random.randint(0, 100)
+                self.players[0].pokemons[p1].moves.append(AllPokemonMoves[randMovePick])
+        for p2 in range(6):
+            randPick = random.randint(0, 150)
+            self.players[1].add_pokemon(AllP2Pokemon[randPick])
+            for move in range(4):
+                randMovePick = random.randint(0, 120)
+                self.players[1].pokemons[p2].moves.append(AllPokemonMoves[randMovePick])
+
+        # self.players[0].add_pokemon(Mewtwo(0))
+        # self.players[0].add_pokemon(Mewtwo(0))
+        # self.players[1].add_pokemon(Mew(1))
+        # self.players[1].add_pokemon(Mew(1))
         self.health_bars = [HealthBar((725, 450), None), HealthBar((225, 150), None)]
 
         self.player1_move = None
-        button_offset = pygame.Vector2(500, 425)
+        button_offset = pygame.Vector2(1000, 100)
         self.buttons[Game.PLAYER1_CHOOSE_POKEMON] = []
         self.buttons[Game.PLAYER2_CHOOSE_POKEMON] = []
         self.buttons[Game.PLAYER1_CHOOSE_MOVE] = []
@@ -1937,9 +2368,12 @@ class Game:
 
 
     def draw(self):
-        pos2 = (50, 525)
-        # Drawing 
+        pos2 = (125, 550)
+        
         screen.fill(pygame.Color(255,255,255)) # Clear Screen
+        image = pygame.image.load(os.path.join('UI', "PBC.PNG"))
+        image = pygame.transform.scale_by(image, 3.5)
+        screen.blit(image, (52, 0))
         for button in self.buttons[self.state]: #TODO Add Status to pokemon button
             button.draw()
 
@@ -1947,10 +2381,10 @@ class Game:
             if player.active_pokemon != None:
                 sprite = player.active_pokemon.sprite
                 sprite = pygame.transform.scale_by(sprite, 4)
-                screen.blit(sprite, (0 + 500 * player.index, 200 - 200 * player.index)) # Draw Sprite
-                TypeLabel((500 - 450 * player.index, 400 - 300 * player.index), player.active_pokemon.name, player.active_pokemon.type).draw()
-                TypeLabel((700 - 450 * player.index, 400 - 300 * player.index), '', player.active_pokemon.type2).draw()
-                StatusLabel((550 - 500 * player.index, 445 - 300 * player.index), player.active_pokemon.status).draw()
+                screen.blit(sprite, (130 + 400 * player.index, 180 - 160 * player.index)) # Draw Sprite
+                TypeLabel((600 - 480 * player.index, 400 - 300 * player.index), player.active_pokemon.name, player.active_pokemon.type).draw()
+                TypeLabel((700 - 480 * player.index, 400 - 300 * player.index), '', player.active_pokemon.type2).draw()
+                StatusLabel((550 - 520 * player.index, 445 - 300 * player.index), player.active_pokemon.status).draw()
                 self.health_bars[player.index].draw()
 
         if self.state == Game.PLAYER1_CHOOSE_POKEMON:
@@ -1976,10 +2410,10 @@ class Game:
 
             
 
-        pygame.display.flip() # Actually Draws Everything
+        pygame.display.flip() # Draws Everything
 
     def choose_pokemon(self, player, index):
-        button_offset = pygame.Vector2(500, 550)
+        button_offset = pygame.Vector2(1000, 100)
         player.set_active_pokemon(player.pokemons[index])
         if player.index == 0:
             self.buttons[Game.PLAYER1_CHOOSE_MOVE] = []
@@ -2028,7 +2462,7 @@ class Game:
 
     def on_round_end(self, pokemon):
         if pokemon.status == Status.BURN:
-            if pokemon.burn_count < 1:
+            if pokemon.burn_count != None and pokemon.burn_count < 1:
                 pokemon.burn_count = None
                 pokemon.status = Status.NONE
             pokemon.take_damage(pokemon.max_health // 8)
@@ -2044,11 +2478,14 @@ class Game:
         elif pokemon.status == Status.POISON:
             pokemon.take_damage(pokemon.max_health // 8)
             Game.set_text(pokemon.name + " is Poisoned")
+            return False
         elif pokemon.status == Status.WATERBURN:
             pokemon.take_damage(pokemon.max_health // 8)
             pokemon.water_burn -= 1
+            Game.set_text(pokemon.name + " is Getting Squeezed")
             if pokemon.water_burn == 0:
                 pokemon.status = Status.NONE
+            return False
             
         return True
 
