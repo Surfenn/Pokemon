@@ -37,6 +37,7 @@ class Pokemon:
         self.speed = ((((speed + self.iv) * 2 + (self.ev//4)) // 100) * level) + 5
         self.status = Status.NONE
         self.moves = [Switch()]
+        self.moveSet = []
         self.sleep_count = 0
         self.poison_count = 0
         self.frozen_count = 0
@@ -55,6 +56,11 @@ class Pokemon:
             self.set_status(Status.FAINTED)
             Game.set_text(self.name + " Fainted")
     
+    def generateMoveSet(self):
+        while len(self.moves) <= 4:
+            randomMove = random.randint(0, len(self.moveSet) - 1)
+            self.moves.append(self.moveSet[randomMove])
+
     def display_moves(self):
         for i in range(len(self.moves)):
             Game.set_text(str(i) + ". " + str(self.moves[i]))
@@ -119,7 +125,6 @@ class Move:
             Game.set_text(user.name + " Missed")
             self.current_uses -= 1
             return Status.NONE
-
 
     def check_status(self, user):
         if(user.status == Status.SLEEP):
@@ -343,668 +348,1366 @@ class Bulbasaur(Pokemon):
     def __init__(self, index):
         super().__init__("Bulbasaur", Type.GRASS, 50, 45, 49, 49, 45, "bulbasaur", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            Tackle(), VineWhip(), PoisonPowder(),
+            RazorLeaf(), SleepPowder(), SolarBeam(),
+            Cut(), Toxic(), BodySlam(), TakeDown(),
+            DoubleEdge(), Rage(), MegaDrain(), Rest()
+        ]
         
 class Ivysaur(Pokemon):
     def __init__(self, index):
         super().__init__("Ivysaur", Type.GRASS, 50, 60, 62, 63, 60, "ivysaur", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            Tackle(), VineWhip(), PoisonPowder(),
+            RazorLeaf(), SleepPowder(), SolarBeam(),
+            Cut(), Toxic(), BodySlam(), TakeDown(),
+            DoubleEdge(), Rage(), MegaDrain(), Rest()
+        ]
 
 class Venusaur(Pokemon):
     def __init__(self, index):
         super().__init__("Venusaur", Type.GRASS, 50, 80, 82, 83, 80, "venusaur", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            Tackle(), VineWhip(), PoisonPowder(),
+            RazorLeaf(), SleepPowder(), SolarBeam(),
+            Cut(), Toxic(), BodySlam(), TakeDown(),
+            DoubleEdge(), Rage(), MegaDrain(), Rest(), HyperBeam()
+        ]
 
 class Charmander(Pokemon):
     def __init__(self, index):
         super().__init__("Charmander", Type.FIRE, 50, 39, 52, 43, 65, "charmander", index)
+        self.moveSet = [
+            Scratch(), Ember(), Flamethrower(), FireSpin(), FireBlast(),
+            Rage(), Slash(), DragonRage(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Submission(), SeismicToss(), Rest(), Cut(), Strength()
+        ]
 
 class Charmeleon(Pokemon):
     def __init__(self, index):
         super().__init__("Charmeleon", Type.FIRE, 50, 58, 64, 58, 80, "charmeleon", index)
+        self.moveSet = [
+            Scratch(), Ember(), Flamethrower(), FireSpin(), FireBlast(),
+            Rage(), Slash(), DragonRage(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Submission(), SeismicToss(), Rest(), Cut(), Strength()
+        ]
 
 class Charizard(Pokemon):
     def __init__(self, index):
         super().__init__("Charizard", Type.FIRE, 50, 78, 84, 78, 100, "charizard", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Scratch(), Ember(), Flamethrower(), FireSpin(), FireBlast(),
+            Rage(), Slash(), DragonRage(),
+            WingAttack(), Fly(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Submission(), SeismicToss(), Rest(), Cut(), Strength(), HyperBeam()
+        ]
 
 class Squirtle(Pokemon):
     def __init__(self, index):
         super().__init__("Squirtle", Type.WATER, 50, 44, 48, 65, 43, "squirtle", index)
+        self.moveSet = [
+            Tackle(), Bubble(), WaterGun(), HydroPump(), Bite(), Surf(),
+            IceBeam(), Blizzard(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            SeismicToss(), Dig(), Rest(), Strength()
+        ]
 
 class Wartortle(Pokemon):
     def __init__(self, index):
         super().__init__("Wartortle", Type.WATER, 50, 59, 63, 80, 58, "wartortle", index)
+        self.moveSet = [
+            Tackle(), Bubble(), WaterGun(), HydroPump(), Bite(), Surf(),
+            IceBeam(), Blizzard(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            SeismicToss(), Dig(), Rest(), Strength()
+        ]
 
 class Blastoise(Pokemon):
     def __init__(self, index):
         super().__init__("Blastoise", Type.WATER, 50, 79, 83, 100, 78, "blastoise", index)
-
+        self.moveSet = [
+            Tackle(), Bubble(), WaterGun(), HydroPump(), Bite(), Surf(),
+            IceBeam(), Blizzard(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            SeismicToss(), Dig(), Rest(), Strength(), HyperBeam()
+        ]
 class Caterpie(Pokemon):
     def __init__(self, index):
         super().__init__("Caterpie", Type.BUG, 50, 45, 30, 35, 45, "caterpie", index)
+        self.moveSet = [
+            Tackle()
+        ]
 
 class Metapod(Pokemon):
     def __init__(self, index):
         super().__init__("Metapod", Type.BUG, 50, 50, 20, 55, 30, "metapod", index)
+        self.moveSet = [
+            Tackle()
+        ]
 
 class Butterfree(Pokemon):
     def __init__(self, index):
         super().__init__("Butterfree", Type.BUG, 50, 60, 45, 50, 70, "butterfree", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Confusion(), Psybeam(), SleepPowder(), StunSpore(), PoisonPowder(),
+            Gust(), Supersonic(),
+            Rest()
+        ]
 
 class Weedle(Pokemon):
     def __init__(self, index):
         super().__init__("Weedle", Type.BUG, 50, 40, 35, 30, 50, "weedle", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            Tackle(), PoisonSting()
+        ]
 
 class Kakuna(Pokemon):
     def __init__(self, index):
         super().__init__("Kakuna", Type.BUG, 50, 45, 25, 50, 35, "kakuna", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            Tackle(), PoisonSting()
+        ]
 
 class Beedrill(Pokemon):
     def __init__(self, index):
         super().__init__("Beedrill", Type.BUG, 50, 65, 90, 40, 75, "beedrill", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            FuryAttack(), Twineedle(), Rage(),
+            PinMissile(), TakeDown(), DoubleEdge(),
+            Rest()
+        ]
 
 class Pidgey(Pokemon):
     def __init__(self, index):
         super().__init__("Pidgey", Type.NORMAL, 50, 40, 45, 40, 56, "pidgey", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Tackle(), Gust(), QuickAttack(),
+            WingAttack(), 
+            TakeDown(), DoubleEdge(), SkyAttack(),
+            Rest()
+        ]
 
 class Pidgeotto(Pokemon):
     def __init__(self, index):
         super().__init__("Pidgeotto", Type.NORMAL, 50, 63, 60, 55, 71, "pidgeotto", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Tackle(), Gust(), QuickAttack(),
+            WingAttack(),
+            TakeDown(), DoubleEdge(), SkyAttack(),
+            Rest()
+        ]
 
 class Pidgeot(Pokemon):
     def __init__(self, index):
         super().__init__("Pidgeot", Type.NORMAL, 50, 83, 80, 75, 91, "pidgeot", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Tackle(), Gust(), QuickAttack(),
+            WingAttack(),
+            TakeDown(), DoubleEdge(), SkyAttack(),
+            Rest(), HyperBeam()
+        ]
 
 class Rattata(Pokemon):
     def __init__(self, index):
         super().__init__("Rattata", Type.NORMAL, 50, 30, 56, 35, 72, "rattata", index)
+        self.moveSet = [
+            Tackle(), QuickAttack(), Bite(), HyperFang(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Rage(), Rest()
+        ]
 
 class Raticate(Pokemon):
     def __init__(self, index):
         super().__init__("Raticate", Type.NORMAL, 50, 55, 81, 60, 97, "raticate", index)
-
+        self.moveSet = [
+            Tackle(), QuickAttack(), Bite(), HyperFang(), SuperFang(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Rage(), Rest(), HyperBeam()
+        ]
 class Spearow(Pokemon):
     def __init__(self, index):
         super().__init__("Spearow", Type.NORMAL, 50, 40, 60, 30, 70, "spearow", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Peck(), FuryAttack(),
+            DrillPeck(),
+            TakeDown(), DoubleEdge(),
+            Rest()
+        ]
 
 class Fearow(Pokemon):
     def __init__(self, index):
         super().__init__("Fearow", Type.NORMAL, 50, 65, 90, 65, 100, "fearow", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Peck(), FuryAttack(),
+            DrillPeck(),
+            TakeDown(), DoubleEdge(),
+            Rest(), HyperBeam()
+        ]
 
 class Ekans(Pokemon):
     def __init__(self, index):
         super().__init__("Ekans", Type.POISON, 50, 35, 60, 44, 55, "ekans", index)
+        self.moveSet = [
+            Tackle(), Bite(), PoisonGas(), Acid(), Glare(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Rest()
+        ]
 
 class Arbok(Pokemon):
     def __init__(self, index):
         super().__init__("Arbok", Type.POISON, 50, 60, 85, 69, 80, "arbok", index)
+        self.moveSet = [
+            Tackle(), Bite(), PoisonGas(), Acid(), Glare(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Rest(), HyperBeam()
+        ]
 
 class Pikachu(Pokemon):
     def __init__(self, index):
         super().__init__("Pikachu", Type.ELECTRIC, 50, 35, 55, 30, 90, "pikachu", index)
+        self.moveSet = [
+            QuickAttack(), ThunderShock(), Thunderbolt(), ThunderWave(), Thunder(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            SeismicToss(), Rest()
+        ]
 
 class Raichu(Pokemon):
     def __init__(self, index):
         super().__init__("Raichu", Type.ELECTRIC, 50, 60, 90, 55, 100, "raichu", index)
+        self.moveSet = [
+            QuickAttack(), ThunderShock(), Thunderbolt(), ThunderWave(), Thunder(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            SeismicToss(), Rest(), HyperBeam()
+        ]
 
 class Sandshrew(Pokemon):
     def __init__(self, index):
         super().__init__("Sandshrew", Type.GROUND, 50, 50, 75, 85, 40, "sandshrew", index)
+        self.moveSet = [
+            Scratch(), Slash(), FurySwipe(),
+            Earthquake(), Fissure(), Dig(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            SeismicToss(), Rest()
+        ]
 
 class Sandslash(Pokemon):
     def __init__(self, index):
         super().__init__("Sandslash", Type.GROUND, 50, 75, 100, 110, 65, "sandslash", index)
+        self.moveSet = [
+            Scratch(), Slash(), FurySwipe(),
+            Earthquake(), Fissure(), Dig(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            SeismicToss(), Rest(), HyperBeam()
+        ]
 
 class NidoranF(Pokemon):
     def __init__(self, index):
         super().__init__("Nidoran♀", Type.POISON, 50, 55, 47, 52, 41, "nidoran-f", index)
+        self.moveSet = [
+            Tackle(), PoisonSting(), Scratch(), FurySwipe(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Bite(), Rest()
+        ]
 
 class Nidorina(Pokemon):
     def __init__(self, index):
         super().__init__("Nidorina", Type.POISON, 50, 70, 62, 67, 56, "nidorina", index)
+        self.moveSet = [
+            Tackle(), PoisonSting(), Scratch(), FurySwipe(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Bite(), Rest()
+        ]
 
 class Nidoqueen(Pokemon):
     def __init__(self, index):
         super().__init__("Nidoqueen", Type.POISON, 50, 90, 82, 87, 76, "nidoqueen", index)
         self.type2 = Type.GROUND
+        self.moveSet = [
+            Tackle(), PoisonSting(), Scratch(), FurySwipe(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Bite(), Earthquake(), Fissure(), SeismicToss(), Rest(), HyperBeam()
+        ]
 
 class NidoranM(Pokemon):
     def __init__(self, index):
         super().__init__("Nidoran♂", Type.POISON, 50, 46, 57, 40, 50, "nidoran-m", index)
+        self.moveSet = [
+            Tackle(), HornAttack(), PoisonSting(), FuryAttack(),
+            DoubleKick(), HornDrill(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Bite(), Rest()
+        ]
 
 class Nidorino(Pokemon):
     def __init__(self, index):
         super().__init__("Nidorino", Type.POISON, 50, 61, 72, 57, 65, "nidorino", index)
+        self.moveSet = [
+            Tackle(), HornAttack(), PoisonSting(), FuryAttack(),
+            DoubleKick(), HornDrill(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Bite(), Rest()
+        ]
 
 class Nidoking(Pokemon):
     def __init__(self, index):
         super().__init__("Nidoking", Type.POISON, 50, 81, 92, 77, 85, "nidoking", index)
         self.type2 = Type.GROUND
+        self.moveSet = [
+            Tackle(), HornAttack(), PoisonSting(), FuryAttack(),
+            DoubleKick(), HornDrill(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Bite(), Earthquake(), Fissure(), SeismicToss(), Rest(), HyperBeam()
+        ]
 
 class Clefairy(Pokemon):
     def __init__(self, index):
         super().__init__("Clefairy", Type.NORMAL, 50, 70, 45, 48, 35, "clefairy", index)
+        self.moveSet = [
+            Pound(), Sing(), DoubleSlap(), BodySlam(),
+            TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Clefable(Pokemon):
     def __init__(self, index):
         super().__init__("Clefable", Type.NORMAL, 50, 95, 70, 73, 60, "clefable", index)
+        self.moveSet = [
+            Pound(), Sing(), DoubleSlap(), BodySlam(),
+            TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Vulpix(Pokemon):
     def __init__(self, index):
         super().__init__("Vulpix", Type.FIRE, 50, 38, 41, 40, 65, "vulpix", index)
+        self.moveSet = [
+            Ember(), QuickAttack(), ConfuseRay(), Flamethrower(), FireSpin(),
+            BodySlam(), TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Ninetales(Pokemon):
     def __init__(self, index):
         super().__init__("Ninetales", Type.FIRE, 50, 73, 76, 75, 100, "ninetales", index)
-
+        self.moveSet = [
+            Ember(), QuickAttack(), ConfuseRay(), Flamethrower(), FireSpin(),
+            BodySlam(), TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
+    
 class Jigglypuff(Pokemon):
     def __init__(self, index):
         super().__init__("Jigglypuff", Type.NORMAL, 50, 115, 45, 20, 20, "jigglypuff", index)
+        self.moveSet = [
+            Pound(), Sing(), DoubleSlap(), BodySlam(),
+            TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Wigglytuff(Pokemon):
     def __init__(self, index):
         super().__init__("Wigglytuff", Type.NORMAL, 50, 140, 70, 45, 45, "wigglytuff", index)
+        self.moveSet = [
+            Pound(), Sing(), DoubleSlap(), BodySlam(),
+            TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Zubat(Pokemon):
     def __init__(self, index):
         super().__init__("Zubat", Type.POISON, 50, 40, 45, 35, 55, "zubat", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Bite(), Supersonic(), WingAttack(),
+            ConfuseRay(), LeechLife(), Rest()
+        ]
 
 class Golbat(Pokemon):
     def __init__(self, index):
         super().__init__("Golbat", Type.POISON, 50, 75, 80, 70, 90, "golbat", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Bite(), Supersonic(), WingAttack(),
+            ConfuseRay(), LeechLife(), Rest(), HyperBeam()
+        ]
 
 class Oddish(Pokemon):
     def __init__(self, index):
         super().__init__("Oddish", Type.GRASS, 50, 45, 50, 55, 30, "oddish", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            Absorb(), Acid(), PoisonPowder(), StunSpore(),
+            SleepPowder(), SolarBeam(), Rest()
+        ]
 
 class Gloom(Pokemon):
     def __init__(self, index):
         super().__init__("Gloom", Type.GRASS, 50, 60, 65, 70, 40, "gloom", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            Absorb(), Acid(), PoisonPowder(), StunSpore(),
+            SleepPowder(), SolarBeam(), Rest()
+        ]
 
 class Vileplume(Pokemon):
     def __init__(self, index):
         super().__init__("Vileplume", Type.GRASS, 50, 75, 80, 85, 50, "vileplume", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            Absorb(), Acid(), PoisonPowder(), StunSpore(),
+            SleepPowder(), SolarBeam(), Rest(), HyperBeam()
+        ]
 
 class Paras(Pokemon):
     def __init__(self, index):
         super().__init__("Paras", Type.BUG, 50, 35, 70, 55, 25, "paras", index)
         self.type2 = Type.GRASS
+        self.moveSet = [
+            Scratch(), StunSpore(), PoisonPowder(), Spore(),
+            LeechLife(), Slash(), BodySlam(),
+            TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Parasect(Pokemon):
     def __init__(self, index):
         super().__init__("Parasect", Type.BUG, 50, 60, 95, 80, 30, "parasect", index)
         self.type2 = Type.GRASS
+        self.moveSet = [
+            Scratch(), StunSpore(), PoisonPowder(), Spore(),
+            LeechLife(), Slash(), BodySlam(),
+            TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Venonat(Pokemon):
     def __init__(self, index):
         super().__init__("Venonat", Type.BUG, 50, 60, 55, 50, 45, "venonat", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            Tackle(), PoisonPowder(), StunSpore(), SleepPowder(),
+            Supersonic(), Psybeam(), LeechLife(),
+            TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Venomoth(Pokemon):
     def __init__(self, index):
         super().__init__("Venomoth", Type.BUG, 50, 70, 65, 60, 90, "venomoth", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            Tackle(), PoisonPowder(), StunSpore(), SleepPowder(),
+            Supersonic(), Psybeam(), LeechLife(),
+            TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Diglett(Pokemon):
     def __init__(self, index):
         super().__init__("Diglett", Type.GROUND, 50, 10, 55, 25, 95, "diglett", index)
+        self.moveSet = [
+            Scratch(), Dig(), Earthquake(),
+            Fissure(), Slash(), Rest()
+        ]
 
 class Dugtrio(Pokemon):
     def __init__(self, index):
         super().__init__("Dugtrio", Type.GROUND, 50, 35, 80, 50, 120, "dugtrio", index)
+        self.moveSet = [
+            Scratch(), Dig(), Earthquake(),
+            Fissure(), Slash(), Rest(), HyperBeam()
+        ]
 
 class Meowth(Pokemon):
     def __init__(self, index):
         super().__init__("Meowth", Type.NORMAL, 50, 40, 45, 35, 90, "meowth", index)
+        self.moveSet = [
+            Scratch(), Bite(), PayDay(),
+            FurySwipe(), Slash(), BodySlam(),
+            TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Persian(Pokemon):
     def __init__(self, index):
         super().__init__("Persian", Type.NORMAL, 50, 65, 70, 60, 115, "persian", index)
+        self.moveSet = [
+            Scratch(), Bite(), PayDay(),
+            FurySwipe(), Slash(), BodySlam(),
+            TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Psyduck(Pokemon):
     def __init__(self, index):
         super().__init__("Psyduck", Type.WATER, 50, 50, 52, 48, 55, "psyduck", index)
+        self.moveSet = [
+            Scratch(), Confusion(), WaterGun(), HydroPump(),
+            Surf(), FurySwipe(),
+            BodySlam(), TakeDown(), DoubleEdge(), Dig(),
+            SeismicToss(), Rest()
+        ]
 
 class Golduck(Pokemon):
     def __init__(self, index):
         super().__init__("Golduck", Type.WATER, 50, 80, 82, 78, 85, "golduck", index)
+        self.moveSet = [
+            Scratch(), Confusion(), WaterGun(), HydroPump(),
+            Surf(), FurySwipe(),
+            BodySlam(), TakeDown(), DoubleEdge(), Dig(),
+            SeismicToss(), Rest(), HyperBeam()
+        ]
 
 class Mankey(Pokemon):
     def __init__(self, index):
         super().__init__("Mankey", Type.FIGHTING, 50, 40, 80, 35, 70, "mankey", index)
+        self.moveSet = [
+            Scratch(), KarateChop(), SeismicToss(),
+            Thrash(), Rage(), BodySlam(),
+            TakeDown(), DoubleEdge(), Submission(), Rest()
+        ]
 
 class Primeape(Pokemon):
     def __init__(self, index):
         super().__init__("Primeape", Type.FIGHTING, 50, 65, 105, 60, 95, "primeape", index)
+        self.moveSet = [
+            Scratch(), KarateChop(), SeismicToss(),
+            Thrash(), Rage(), BodySlam(),
+            TakeDown(), DoubleEdge(), Submission(), Rest(), HyperBeam()
+        ]
 
 class Growlithe(Pokemon):
     def __init__(self, index):
         super().__init__("Growlithe", Type.FIRE, 50, 55, 70, 45, 60, "growlithe", index)
+        self.moveSet = [
+            Bite(), Ember(), Flamethrower(), FireBlast(),
+            TakeDown(), BodySlam(),
+            DoubleEdge(), Rage(), Rest()
+        ]
 
 class Arcanine(Pokemon):
     def __init__(self, index):
         super().__init__("Arcanine", Type.FIRE, 50, 90, 110, 80, 95, "arcanine", index)
+        self.moveSet = [
+            Bite(), Ember(), Flamethrower(), FireBlast(),
+            TakeDown(), BodySlam(),
+            DoubleEdge(), Rage(), Rest(), HyperBeam()
+        ]
 
 class Poliwag(Pokemon):
     def __init__(self, index):
         super().__init__("Poliwag", Type.WATER, 50, 40, 50, 40, 90, "poliwag", index)
+        self.moveSet = [
+            Bubble(), WaterGun(), HydroPump(), BodySlam(),
+            Hypnosis(), DoubleSlap(), TakeDown(), DoubleEdge(),
+            Rest()
+        ]
 
 class Poliwhirl(Pokemon):
     def __init__(self, index):
         super().__init__("Poliwhirl", Type.WATER, 50, 65, 65, 65, 90, "poliwhirl", index)
+        self.moveSet = [
+            Bubble(), WaterGun(), HydroPump(), BodySlam(),
+            Hypnosis(), DoubleSlap(), TakeDown(), DoubleEdge(),
+            Rest()
+        ]
 
 class Poliwrath(Pokemon):
     def __init__(self, index):
-        super().__init__("Poliwrath", Type.WATER, 50, 90, 85, 95, 70, "poliwrath", index)
+        super().__init__("Poliwrath", Type.WATER, 50, 90, 95, 95, 70, "poliwrath", index)
         self.type2 = Type.FIGHTING
+        self.moveSet = [
+            Bubble(), WaterGun(), HydroPump(), BodySlam(),
+            Hypnosis(), DoubleSlap(), TakeDown(), DoubleEdge(),
+            Submission(), SeismicToss(), Rest(), HyperBeam()
+        ]
 
 class Abra(Pokemon):
     def __init__(self, index):
         super().__init__("Abra", Type.PSYCHIC, 50, 25, 20, 15, 90, "abra", index)
+        self.moveSet = [
+            Rest()
+        ]
 
 class Kadabra(Pokemon):
     def __init__(self, index):
         super().__init__("Kadabra", Type.PSYCHIC, 50, 40, 35, 30, 105, "kadabra", index)
+        self.moveSet = [
+            Confusion(), Psychic(), Psybeam(),
+            SeismicToss(), Rest()
+        ]
 
 class Alakazam(Pokemon):
     def __init__(self, index):
         super().__init__("Alakazam", Type.PSYCHIC, 50, 55, 50, 45, 120, "alakazam", index)
+        self.moveSet = [
+            Confusion(), Psychic(), Psybeam(),
+            SeismicToss(), Rest(), HyperBeam()
+        ]
 
 class Machop(Pokemon):
     def __init__(self, index):
         super().__init__("Machop", Type.FIGHTING, 50, 70, 80, 50, 35, "machop", index)
+        self.moveSet = [
+            KarateChop(), SeismicToss(), Submission(),
+            BodySlam(), TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Machoke(Pokemon):
     def __init__(self, index):
         super().__init__("Machoke", Type.FIGHTING, 50, 80, 100, 70, 45, "machoke", index)
+        self.moveSet = [
+            KarateChop(), SeismicToss(), Submission(),
+            BodySlam(), TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Machamp(Pokemon):
     def __init__(self, index):
         super().__init__("Machamp", Type.FIGHTING, 50, 90, 130, 80, 55, "machamp", index)
+        self.moveSet = [
+            KarateChop(), SeismicToss(), Submission(),
+            BodySlam(), TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Bellsprout(Pokemon):
     def __init__(self, index):
         super().__init__("Bellsprout", Type.GRASS, 50, 50, 75, 35, 40, "bellsprout", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            VineWhip(), Acid(), SleepPowder(),
+            StunSpore(), PoisonPowder(), RazorLeaf(),
+            Wrap(), Rest()
+        ]
 
 class Weepinbell(Pokemon):
     def __init__(self, index):
         super().__init__("Weepinbell", Type.GRASS, 50, 65, 90, 50, 55, "weepinbell", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            VineWhip(), Acid(), SleepPowder(),
+            StunSpore(), PoisonPowder(), RazorLeaf(),
+            Wrap(), Rest()
+        ]
 
 class Victreebel(Pokemon):
     def __init__(self, index):
         super().__init__("Victreebel", Type.GRASS, 50, 80, 105, 65, 70, "victreebel", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            VineWhip(), Acid(), SleepPowder(),
+            StunSpore(), PoisonPowder(), RazorLeaf(),
+            Wrap(), Rest(), HyperBeam()
+        ]
 
 class Tentacool(Pokemon):
     def __init__(self, index):
         super().__init__("Tentacool", Type.WATER, 50, 40, 40, 35, 70, "tentacool", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            PoisonSting(), Acid(), BubbleBeam(),
+            Surf(), Wrap(), Rest()
+        ]
 
 class Tentacruel(Pokemon):
     def __init__(self, index):
         super().__init__("Tentacruel", Type.WATER, 50, 80, 70, 65, 100, "tentacruel", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            PoisonSting(), Acid(), BubbleBeam(),
+            Surf(), Wrap(), Rest(), HyperBeam()
+        ]
 
 class Geodude(Pokemon):
     def __init__(self, index):
         super().__init__("Geodude", Type.ROCK, 50, 40, 80, 100, 20, "geodude", index)
         self.type2 = Type.GROUND
+        self.moveSet = [
+            Tackle(), RockThrow(), Earthquake(), Fissure(),
+            SeismicToss(), SelfDestruct(), Rest()
+        ]
 
 class Graveler(Pokemon):
     def __init__(self, index):
         super().__init__("Graveler", Type.ROCK, 50, 55, 95, 115, 35, "graveler", index)
         self.type2 = Type.GROUND
+        self.moveSet = [
+            Tackle(), RockThrow(), Earthquake(), Fissure(),
+            SeismicToss(), SelfDestruct(), Rest()
+        ]
 
 class Golem(Pokemon):
     def __init__(self, index):
         super().__init__("Golem", Type.ROCK, 50, 80, 110, 130, 45, "golem", index)
         self.type2 = Type.GROUND
+        self.moveSet = [
+            Tackle(), RockThrow(), Earthquake(), Fissure(),
+            SeismicToss(), SelfDestruct(), Explosion(), Rest(), HyperBeam()
+        ]
 
 class Ponyta(Pokemon):
     def __init__(self, index):
         super().__init__("Ponyta", Type.FIRE, 50, 50, 85, 55, 90, "ponyta", index)
+        self.moveSet = [
+            Ember(), FireSpin(), FireBlast(), Stomp(),
+            TakeDown(), DoubleEdge(),
+            BodySlam(), Rest()
+        ]
 
 class Rapidash(Pokemon):
     def __init__(self, index):
         super().__init__("Rapidash", Type.FIRE, 50, 65, 100, 70, 105, "rapidash", index)
+        self.moveSet = [
+            Ember(), FireSpin(), FireBlast(), Stomp(),
+            TakeDown(), DoubleEdge(),
+            BodySlam(), Rest(), HyperBeam()
+        ]
 
 class Slowpoke(Pokemon):
     def __init__(self, index):
         super().__init__("Slowpoke", Type.WATER, 50, 90, 65, 65, 15, "slowpoke", index)
         self.type2 = Type.PSYCHIC
+        self.moveSet = [
+            Tackle(), Confusion(), Psychic(), WaterGun(),
+            Surf(), Headbutt(), 
+            BodySlam(), TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Slowbro(Pokemon):
     def __init__(self, index):
         super().__init__("Slowbro", Type.WATER, 50, 95, 75, 110, 30, "slowbro", index)
         self.type2 = Type.PSYCHIC
+        self.moveSet = [
+            Tackle(), Confusion(), Psychic(), WaterGun(),
+            Surf(), Headbutt(), 
+            BodySlam(), TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Magnemite(Pokemon):
     def __init__(self, index):
         super().__init__("Magnemite", Type.ELECTRIC, 50, 25, 35, 70, 45, "magnemite", index)
+        self.moveSet = [
+            Tackle(), ThunderShock(), Thunderbolt(), ThunderWave(), Thunder(),
+            Supersonic(), Swift(), Rest()
+        ]
 
 class Magneton(Pokemon):
     def __init__(self, index):
         super().__init__("Magneton", Type.ELECTRIC, 50, 50, 60, 95, 70, "magneton", index)
+        self.moveSet = [
+            Tackle(), ThunderShock(), Thunderbolt(), ThunderWave(), Thunder(),
+            Supersonic(), Swift(), Rest(), HyperBeam()
+        ]
 
 class Farfetchd(Pokemon):
     def __init__(self, index):
         super().__init__("Farfetch'd", Type.NORMAL, 50, 52, 65, 55, 60, "farfetchd", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Peck(), FuryAttack(), Slash(),
+            BodySlam(), TakeDown(), DoubleEdge(),
+            Fly(), Rest()
+        ]
 
 class Doduo(Pokemon):
     def __init__(self, index):
         super().__init__("Doduo", Type.NORMAL, 50, 35, 85, 45, 75, "doduo", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Peck(), FuryAttack(), DrillPeck(), Rage(),
+            BodySlam(), TakeDown(),
+            DoubleEdge(), Rest()
+        ]
 
 class Dodrio(Pokemon):
     def __init__(self, index):
         super().__init__("Dodrio", Type.NORMAL, 50, 60, 110, 70, 100, "dodrio", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Peck(), FuryAttack(), DrillPeck(), Rage(),
+            BodySlam(), TakeDown(),
+            DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Seel(Pokemon):
     def __init__(self, index):
         super().__init__("Seel", Type.WATER, 50, 65, 45, 55, 45, "seel", index)
+        self.moveSet = [
+            Headbutt(), AuroraBeam(), Rest(),
+            Surf(), IceBeam(), Blizzard(), TakeDown(),
+            DoubleEdge(), BodySlam()
+        ]
 
 class Dewgong(Pokemon):
     def __init__(self, index):
         super().__init__("Dewgong", Type.WATER, 50, 90, 70, 80, 70, "dewgong", index)
         self.type2 = Type.ICE
+        self.moveSet = [
+            Headbutt(), AuroraBeam(), IceBeam(), Blizzard(),
+            Surf(), TakeDown(), DoubleEdge(), BodySlam(),
+            Rest(), HyperBeam()
+        ]
 
 class Grimer(Pokemon):
     def __init__(self, index):
         super().__init__("Grimer", Type.POISON, 50, 80, 80, 50, 25, "grimer", index)
+        self.moveSet = [
+            Pound(), PoisonGas(), Acid(), Smog(), Sludge(),
+            BodySlam(),
+            TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Muk(Pokemon):
     def __init__(self, index):
         super().__init__("Muk", Type.POISON, 50, 105, 105, 75, 50, "muk", index)
+        self.moveSet = [
+            Pound(), PoisonGas(), Acid(), Smog(), Sludge(),
+            BodySlam(),
+            TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Shellder(Pokemon):
     def __init__(self, index):
         super().__init__("Shellder", Type.WATER, 50, 30, 65, 100, 40, "shellder", index)
+        self.moveSet = [
+            Tackle(), Clamp(), Supersonic(), AuroraBeam(),
+            BubbleBeam(), IceBeam(), Blizzard(),
+            TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Cloyster(Pokemon):
     def __init__(self, index):
         super().__init__("Cloyster", Type.WATER, 50, 50, 95, 180, 70, "cloyster", index)
         self.type2 = Type.ICE
+        self.moveSet = [
+            Tackle(), Clamp(), Supersonic(), AuroraBeam(),
+            BubbleBeam(), IceBeam(), Blizzard(),
+            TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Gastly(Pokemon):
     def __init__(self, index):
         super().__init__("Gastly", Type.GHOST, 50, 30, 35, 30, 80, "gastly", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            Lick(), ConfuseRay(), NightShade(), Hypnosis(),
+            Rest()
+        ]
 
 class Haunter(Pokemon):
     def __init__(self, index):
         super().__init__("Haunter", Type.GHOST, 50, 45, 50, 45, 95, "haunter", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            Lick(), ConfuseRay(), NightShade(), Hypnosis(),
+            Rest()
+        ]
 
 class Gengar(Pokemon):
     def __init__(self, index):
         super().__init__("Gengar", Type.GHOST, 50, 60, 65, 60, 110, "gengar", index)
         self.type2 = Type.POISON
+        self.moveSet = [
+            Lick(), ConfuseRay(), NightShade(), Hypnosis(),
+            Rest(), HyperBeam()
+        ]
 
 class Onix(Pokemon):
     def __init__(self, index):
         super().__init__("Onix", Type.ROCK, 50, 35, 45, 160, 70, "onix", index)
         self.type2 = Type.GROUND
+        self.moveSet = [
+            Tackle(), Bind(), RockThrow(), Rage(),
+            Slam(), Earthquake(), Fissure(), Rest()
+        ]
 
 class Drowzee(Pokemon):
     def __init__(self, index):
         super().__init__("Drowzee", Type.PSYCHIC, 50, 60, 48, 45, 42, "drowzee", index)
+        self.moveSet = [
+            Pound(), Confusion(), Psychic(), Hypnosis(),
+            Headbutt(), SeismicToss(),
+            BodySlam(), TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Hypno(Pokemon):
     def __init__(self, index):
         super().__init__("Hypno", Type.PSYCHIC, 50, 85, 73, 70, 67, "hypno", index)
+        self.moveSet = [
+            Pound(), Confusion(), Psychic(), Hypnosis(),
+            Headbutt(), SeismicToss(),
+            BodySlam(), TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Krabby(Pokemon):
     def __init__(self, index):
         super().__init__("Krabby", Type.WATER, 50, 30, 105, 90, 50, "krabby", index)
+        self.moveSet = [
+            Bubble(), ViseGrip(), Stomp(), Guillotine(),
+            Crabhammer(), Rest()
+        ]
 
 class Kingler(Pokemon):
     def __init__(self, index):
         super().__init__("Kingler", Type.WATER, 50, 55, 130, 115, 75, "kingler", index)
+        self.moveSet = [
+            Bubble(), ViseGrip(), Stomp(), Guillotine(),
+            Crabhammer(), Rest(), HyperBeam()
+        ]
 
 class Voltorb(Pokemon):
     def __init__(self, index):
         super().__init__("Voltorb", Type.ELECTRIC, 50, 40, 30, 50, 100, "voltorb", index)
+        self.moveSet = [
+            Tackle(), ThunderShock(), Thunderbolt(), Thunder(),
+            SonicBoom(), SelfDestruct(), Rest()
+        ]
 
 class Electrode(Pokemon):
     def __init__(self, index):
         super().__init__("Electrode", Type.ELECTRIC, 50, 60, 50, 70, 140, "electrode", index)
+        self.moveSet = [
+            Tackle(), ThunderShock(), Thunderbolt(), Thunder(),
+            SonicBoom(), SelfDestruct(), Explosion(), Rest(), HyperBeam()
+        ]
 
 class Exeggcute(Pokemon):
     def __init__(self, index):
         super().__init__("Exeggcute", Type.GRASS, 50, 60, 40, 80, 40, "exeggcute", index)
         self.type2 = Type.PSYCHIC
+        self.moveSet = [
+            Barrage(), Hypnosis(), Confusion(), StunSpore(),
+            SleepPowder(), SolarBeam(), PoisonPowder(), LeechLife(),
+            Rest()
+        ]
 
 class Exeggutor(Pokemon):
     def __init__(self, index):
         super().__init__("Exeggutor", Type.GRASS, 50, 95, 95, 85, 55, "exeggutor", index)
         self.type2 = Type.PSYCHIC
+        self.moveSet = [
+            Barrage(), Hypnosis(), Confusion(), StunSpore(),
+            SleepPowder(), SolarBeam(), PoisonPowder(), LeechLife(),
+            Rest(), HyperBeam()
+        ]
 
 class Cubone(Pokemon):
     def __init__(self, index):
         super().__init__("Cubone", Type.GROUND, 50, 50, 50, 95, 35, "cubone", index)
+        self.moveSet = [
+            BoneClub(), Bonemerang(), Headbutt(),
+            Rage(), Thrash(), Earthquake(), Fissure(),
+            SeismicToss(), BodySlam(), TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Marowak(Pokemon):
     def __init__(self, index):
         super().__init__("Marowak", Type.GROUND, 50, 60, 80, 110, 45, "marowak", index)
+        self.moveSet = [
+            BoneClub(), Bonemerang(), Headbutt(),
+            Rage(), Thrash(), Earthquake(), Fissure(),
+            SeismicToss(), BodySlam(), TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Hitmonlee(Pokemon):
     def __init__(self, index):
         super().__init__("Hitmonlee", Type.FIGHTING, 50, 50, 120, 53, 87, "hitmonlee", index)
+        self.moveSet = [
+            DoubleKick(), JumpKick(), HighJumpKick(),
+            SeismicToss(), BodySlam(), TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Hitmonchan(Pokemon):
     def __init__(self, index):
         super().__init__("Hitmonchan", Type.FIGHTING, 50, 50, 105, 79, 76, "hitmonchan", index)
-
+        self.moveSet = [
+            SeismicToss(), BodySlam(), TakeDown(), DoubleEdge(),
+            FirePunch(), IcePunch(), ThunderPunch(), Rest()
+        ]
+    
 class Lickitung(Pokemon):
     def __init__(self, index):
         super().__init__("Lickitung", Type.NORMAL, 50, 90, 55, 75, 30, "lickitung", index)
+        self.moveSet = [
+            Lick(), Stomp(), Supersonic(), Slam(),
+            BodySlam(), TakeDown(), DoubleEdge(), SeismicToss(), Rest()
+        ]
 
 class Koffing(Pokemon):
     def __init__(self, index):
         super().__init__("Koffing", Type.POISON, 50, 40, 65, 95, 35, "koffing", index)
+        self.moveSet = [
+            Tackle(), Smog(), Sludge(), PoisonGas(),
+            SelfDestruct(), Explosion(), Rest()
+        ]
 
 class Weezing(Pokemon):
     def __init__(self, index):
         super().__init__("Weezing", Type.POISON, 50, 65, 90, 120, 60, "weezing", index)
+        self.moveSet = [
+            Tackle(), Smog(), Sludge(), PoisonGas(),
+            SelfDestruct(), Explosion(), Rest(), HyperBeam()
+        ]
 
 class Rhyhorn(Pokemon):
     def __init__(self, index):
         super().__init__("Rhyhorn", Type.GROUND, 50, 80, 85, 95, 25, "rhyhorn", index)
         self.type2 = Type.ROCK
+        self.moveSet = [
+            HornAttack(), Stomp(), FuryAttack(),
+            Earthquake(), Fissure(), RockSlide(),
+            BodySlam(), TakeDown(), DoubleEdge(), Rest()
+        ]
 
 class Rhydon(Pokemon):
     def __init__(self, index):
         super().__init__("Rhydon", Type.GROUND, 50, 105, 130, 120, 40, "rhydon", index)
         self.type2 = Type.ROCK
+        self.moveSet = [
+            HornAttack(), Stomp(), FuryAttack(),
+            Earthquake(), Fissure(), RockSlide(),
+            BodySlam(), TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Chansey(Pokemon):
     def __init__(self, index):
         super().__init__("Chansey", Type.NORMAL, 50, 250, 5, 5, 50, "chansey", index)
+        self.moveSet = [
+            Pound(), Sing(), DoubleSlap(), EggBomb(),
+            SoftBoiled(), BodySlam(), TakeDown(), DoubleEdge(), SeismicToss(), Rest()
+        ]
 
 class Tangela(Pokemon):
     def __init__(self, index):
         super().__init__("Tangela", Type.GRASS, 50, 65, 55, 115, 60, "tangela", index)
+        self.moveSet = [
+            Constrict(), VineWhip(), Absorb(), StunSpore(),
+            SleepPowder(), Slam(),
+            BodySlam(), Bind(), Rest()
+        ]
 
 class Kangaskhan(Pokemon):
     def __init__(self, index):
         super().__init__("Kangaskhan", Type.NORMAL, 50, 105, 95, 80, 90, "kangaskhan", index)
+        self.moveSet = [
+            Bite(), Rage(),
+            MegaPunch(), DizzyPunch(), BodySlam(),
+            TakeDown(), DoubleEdge(), SeismicToss(), Rest(), HyperBeam()
+        ]
 
 class Horsea(Pokemon):
     def __init__(self, index):
         super().__init__("Horsea", Type.WATER, 50, 30, 40, 70, 60, "horsea", index)
+        self.moveSet = [
+            Bubble(), WaterGun(),
+            HydroPump(), Rest()
+        ]
 
 class Seadra(Pokemon):
     def __init__(self, index):
         super().__init__("Seadra", Type.WATER, 50, 55, 65, 95, 85, "seadra", index)
+        self.moveSet = [
+            Bubble(), WaterGun(),
+            HydroPump(), Rest(), HyperBeam()
+        ]
 
 class Goldeen(Pokemon):
     def __init__(self, index):
         super().__init__("Goldeen", Type.WATER, 50, 45, 67, 60, 63, "goldeen", index)
+        self.moveSet = [
+            Peck(), Supersonic(), HornAttack(),
+            FuryAttack(), Waterfall(), HornDrill(),
+            TakeDown(), Rest()
+        ]
 
 class Seaking(Pokemon):
     def __init__(self, index):
         super().__init__("Seaking", Type.WATER, 50, 80, 92, 65, 68, "seaking", index)
+        self.moveSet = [
+            Peck(), Supersonic(), HornAttack(),
+            FuryAttack(), Waterfall(), HornDrill(),
+            TakeDown(), Rest(), HyperBeam()
+        ]
 
 class Staryu(Pokemon):
     def __init__(self, index):
         super().__init__("Staryu", Type.WATER, 50, 30, 45, 55, 85, "staryu", index)
+        self.moveSet = [
+            Tackle(), WaterGun(), Swift(),
+            Recover(), Surf(), BubbleBeam(), HydroPump(), Rest()
+        ]
 
 class Starmie(Pokemon):
     def __init__(self, index):
         super().__init__("Starmie", Type.WATER, 50, 60, 75, 85, 115, "starmie", index)
         self.type2 = Type.PSYCHIC
+        self.moveSet = [
+            Tackle(), WaterGun(), Swift(),
+            Recover(), Surf(), BubbleBeam(), HydroPump(), Rest(), HyperBeam()
+        ]
 
-class Mrmime(Pokemon):
+class MrMime(Pokemon):
     def __init__(self, index):
         super().__init__("Mr. Mime", Type.PSYCHIC, 50, 40, 45, 65, 90, "mr-mime", index)
+        self.moveSet = [
+            Confusion(), Psychic(),
+            DoubleSlap(), SeismicToss(), Rest()
+        ]
 
 class Scyther(Pokemon):
     def __init__(self, index):
         super().__init__("Scyther", Type.BUG, 50, 70, 110, 80, 105, "scyther", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            QuickAttack(), WingAttack(), Slash(),
+            Rest(), HyperBeam()
+        ]
 
 class Jynx(Pokemon):
     def __init__(self, index):
         super().__init__("Jynx", Type.ICE, 50, 65, 50, 35, 95, "jynx", index)
         self.type2 = Type.PSYCHIC
+        self.moveSet = [
+            Pound(), LovelyKiss(), IcePunch(),
+            Blizzard(), Confusion(), Psychic(),
+            BodySlam(), Rest()
+        ]
 
 class Electabuzz(Pokemon):
     def __init__(self, index):
         super().__init__("Electabuzz", Type.ELECTRIC, 50, 65, 83, 57, 105, "electabuzz", index)
+        self.moveSet = [
+            QuickAttack(), ThunderShock(), Thunderbolt(), ThunderPunch(),
+            ThunderWave(), Thunder(), Swift(), SeismicToss(),
+            BodySlam(), Rest(), HyperBeam()
+        ]
 
 class Magmar(Pokemon):
     def __init__(self, index):
         super().__init__("Magmar", Type.FIRE, 50, 65, 95, 57, 93, "magmar", index)
+        self.moveSet = [
+            Ember(), FirePunch(), FireBlast(), Flamethrower(),
+            Smog(), ConfuseRay(), Psychic(),
+            BodySlam(), SeismicToss(), Rest(), HyperBeam()
+        ]
 
 class Pinsir(Pokemon):
     def __init__(self, index):
         super().__init__("Pinsir", Type.BUG, 50, 65, 125, 100, 85, "pinsir", index)
+        self.moveSet = [
+            ViseGrip(), SeismicToss(), Bind(), Guillotine(),
+            Submission(), BodySlam(), Rest(), HyperBeam()
+        ]
 
 class Tauros(Pokemon):
     def __init__(self, index):
         super().__init__("Tauros", Type.NORMAL, 50, 75, 100, 95, 110, "tauros", index)
+        self.moveSet = [
+            Tackle(), Stomp(), Rage(), HornAttack(),
+            TakeDown(), DoubleEdge(), BodySlam(),
+            HyperBeam(), Rest()
+        ]
 
 class Magikarp(Pokemon):
     def __init__(self, index):
         super().__init__("Magikarp", Type.WATER, 50, 20, 10, 55, 80, "magikarp", index)
+        self.moveSet = [
+            Tackle()
+        ]
 
 class Gyarados(Pokemon):
     def __init__(self, index):
         super().__init__("Gyarados", Type.WATER, 50, 95, 125, 79, 81, "gyarados", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Bite(), DragonRage(), HydroPump(), Surf(),
+            BodySlam(), Thunderbolt(), HyperBeam(), Rest()
+        ]
 
 class Lapras(Pokemon):
     def __init__(self, index):
         super().__init__("Lapras", Type.WATER, 50, 130, 85, 80, 60, "lapras", index)
         self.type2 = Type.ICE
+        self.moveSet = [
+            WaterGun(), IceBeam(), Blizzard(), BodySlam(),
+            ConfuseRay(), Sing(), Surf(),
+            TakeDown(), DoubleEdge(), Rest(), HyperBeam()
+        ]
 
 class Ditto(Pokemon):
     def __init__(self, index):
         super().__init__("Ditto", Type.NORMAL, 50, 48, 48, 48, 48, "ditto", index)
+        self.moveSet = [
+            Tackle(), Rest()
+        ]
 
 class Eevee(Pokemon):
     def __init__(self, index):
         super().__init__("Eevee", Type.NORMAL, 50, 55, 55, 50, 55, "eevee", index)
+        self.moveSet = [
+            Tackle(), QuickAttack(), Bite(), TakeDown(),
+            DoubleEdge(), BodySlam(), Rest()
+        ]
 
 class Vaporeon(Pokemon):
     def __init__(self, index):
         super().__init__("Vaporeon", Type.WATER, 50, 130, 65, 60, 65, "vaporeon", index)
+        self.moveSet = [
+            Tackle(), QuickAttack(), Bite(), WaterGun(),
+            HydroPump(), Surf(), TakeDown(), DoubleEdge(),
+            BodySlam(), Rest(), HyperBeam()
+        ]
 
 class Jolteon(Pokemon):
     def __init__(self, index):
         super().__init__("Jolteon", Type.ELECTRIC, 50, 65, 65, 60, 130, "jolteon", index)
+        self.moveSet = [
+            Tackle(), QuickAttack(), ThunderShock(), Thunderbolt(),
+            Thunder(), ThunderWave(), PinMissile(), TakeDown(),
+            DoubleEdge(), BodySlam(), Rest(), HyperBeam()
+        ]
 
 class Flareon(Pokemon):
     def __init__(self, index):
         super().__init__("Flareon", Type.FIRE, 50, 65, 130, 60, 65, "flareon", index)
+        self.moveSet = [
+            Tackle(), QuickAttack(), Ember(), FireBlast(),
+            FireSpin(), Flamethrower(), Bite(),
+            TakeDown(), DoubleEdge(), BodySlam(), Rest(), HyperBeam()
+        ]
 
 class Porygon(Pokemon):
     def __init__(self, index):
         super().__init__("Porygon", Type.NORMAL, 50, 65, 60, 70, 40, "porygon", index)
+        self.moveSet = [
+            Tackle(), Psybeam(), Recover(), Thunderbolt(),
+            ThunderWave(), DoubleEdge(), Rest()
+        ]
 
 class Omanyte(Pokemon):
     def __init__(self, index):
         super().__init__("Omanyte", Type.ROCK, 50, 35, 40, 100, 35, "omanyte", index)
         self.type2 = Type.WATER
+        self.moveSet = [
+            WaterGun(), HornAttack(), SpikeCannon(),
+            Surf(), HydroPump(), Rest()
+        ]
 
 class Omastar(Pokemon):
     def __init__(self, index):
         super().__init__("Omastar", Type.ROCK, 50, 70, 60, 125, 55, "omastar", index)
         self.type2 = Type.WATER
+        self.moveSet = [
+            WaterGun(), HornAttack(), SpikeCannon(),
+            Surf(), HydroPump(), Rest(), HyperBeam()
+        ]
 
 class Kabuto(Pokemon):
     def __init__(self, index):
         super().__init__("Kabuto", Type.ROCK, 50, 30, 80, 90, 55, "kabuto", index)
         self.type2 = Type.WATER
+        self.moveSet = [
+            Scratch(), Absorb(), Slash(),
+            Surf(), Rest()
+        ]
 
 class Kabutops(Pokemon):
     def __init__(self, index):
         super().__init__("Kabutops", Type.ROCK, 50, 60, 115, 105, 80, "kabutops", index)
         self.type2 = Type.WATER
+        self.moveSet = [
+            Scratch(), Absorb(), Slash(),
+            Surf(), Rest(), HyperBeam()
+        ]
 
 class Aerodactyl(Pokemon):
     def __init__(self, index):
         super().__init__("Aerodactyl", Type.ROCK, 50, 80, 105, 65, 130, "aerodactyl", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            WingAttack(), Bite(), HyperBeam(),
+            Rest(), TakeDown(), DoubleEdge()
+        ]
 
 class Snorlax(Pokemon):
     def __init__(self, index):
         super().__init__("Snorlax", Type.NORMAL, 50, 160, 110, 65, 30, "snorlax", index)
+        self.moveSet = [
+            Headbutt(), BodySlam(), DoubleEdge(), HyperBeam(),
+            Rest(), Psychic(), Surf(), IcePunch(), ThunderPunch()
+        ]
 
 class Articuno(Pokemon):
     def __init__(self, index):
         super().__init__("Articuno", Type.ICE, 50, 90, 85, 100, 85, "articuno", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Gust(), IceBeam(), Blizzard(),
+            Peck(), Rest(), HyperBeam()
+        ]
 
 class Zapdos(Pokemon):
     def __init__(self, index):
         super().__init__("Zapdos", Type.ELECTRIC, 50, 90, 90, 85, 100, "zapdos", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            ThunderShock(), Thunderbolt(), Thunder(), DrillPeck(),
+            Rest(), HyperBeam()
+        ]
 
 class Moltres(Pokemon):
     def __init__(self, index):
         super().__init__("Moltres", Type.FIRE, 50, 90, 100, 90, 90, "moltres", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            WingAttack(), FireSpin(), Flamethrower(),
+            Peck(), Rest(), HyperBeam()
+        ]
 
 class Dratini(Pokemon):
     def __init__(self, index):
         super().__init__("Dratini", Type.DRAGON, 50, 41, 64, 45, 50, "dratini", index)
+        self.moveSet = [
+            Wrap(), ThunderWave(), Slam(),
+            DragonRage(), Rest()
+        ]
 
 class Dragonair(Pokemon):
     def __init__(self, index):
-        super().__init__("Dragonair", Type.DRAGON, 50, 61, 84, 65, 70, "dragonair", index)
-
+        super().__init__("Dragonair", Type.DRAGON, 50, 61, 84, 70, 70, "dragonair", index)
+        self.moveSet = [
+            Wrap(), ThunderWave(), Slam(),
+            DragonRage(), Rest()
+        ]
+    
 class Dragonite(Pokemon):
     def __init__(self, index):
         super().__init__("Dragonite", Type.DRAGON, 50, 91, 134, 95, 80, "dragonite", index)
         self.type2 = Type.FLYING
+        self.moveSet = [
+            Wrap(), ThunderWave(), Slam(),
+            DragonRage(), HyperBeam(), Rest(), Thunderbolt(), IceBeam(), FireBlast()
+        ]
 
 class Mewtwo(Pokemon):
     def __init__(self, index):
         super().__init__("Mewtwo", Type.PSYCHIC, 50, 106, 110, 90, 130, "mewtwo", index)
+        self.moveSet = [
+            Confusion(), Psychic(), Swift(), Recover(),
+            Rest(), HyperBeam(), Thunderbolt(), IceBeam(), Flamethrower()
+        ]
 
 class Mew(Pokemon):
     def __init__(self, index):
         super().__init__("Mew", Type.PSYCHIC, 50, 100, 100, 100, 100, "mew", index)
-
+        self.moveSet = [
+            Pound(), Psychic(), Confusion(), SeismicToss(),
+            Thunderbolt(), IceBeam(), Flamethrower(), Surf(),
+            Strength(), Fly(), Rest(), HyperBeam()
+        ]
 
 #All Gen 1 Moves From https://pokemondb.net/move/generation/1
 ######################################################################################################################################################################
@@ -1168,7 +1871,7 @@ class Sludge(StatusMove):
             target.set_status(Status.POISON)
         return result
 
-class PosionSting(StatusMove):
+class PoisonSting(StatusMove):
     def __init__(self):
         super().__init__("Posion Sting", Type.POISON, 15, 100, 35, Status.NONE)
     
@@ -1298,6 +2001,18 @@ class Haze(StatusMove):
 class IceBeam(StatusMove):
     def __init__(self):
         super().__init__("Ice Beam", Type.ICE, 90, 100, 10, Status.NONE)
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        if random.randint(1, 100) <= 10:
+            target.set_status(Status.FROZEN)
+        return result
+
+class AuroraBeam(StatusMove):
+    def __init__(self):
+        super().__init__("Aurora Beam", Type.ICE, 65, 100, 20, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -1535,7 +2250,7 @@ class JumpKick(StatusMove):
             user.current_health -= user.max_health // 2
             return Status.NONE
 
-class karateChop(Move):
+class KarateChop(Move):
     def __init__(self):
         super().__init__("Karate Chop", Type.FIGHTING, 50, 25)
 
@@ -1943,6 +2658,7 @@ class TestMove(Move):
 
 
 class Button:
+
     margin = 5
     def __init__(self, position, size, text):
         self.position = position
@@ -2014,11 +2730,11 @@ class MoveButton(Button):
         if self.move.damage != 0:
             screen.blit(font.render(str(self.move.damage), True, pygame.Color(0, 0, 0)), (self.position[0] + Button.margin, self.position[1] + 40))
 
+
 class HealthBar():
     def __init__(self, position, pokemon):
         self.position = position
         self.pokemon = pokemon
-
 
     def draw(self):
         surface = font.render(str(self.pokemon.current_health) + "/" + str(self.pokemon.max_health), True, pygame.Color(0, 0, 0))
@@ -2041,6 +2757,7 @@ class TypeLabel():
         if self.type in Type.sprites:
             screen.blit(Type.sprites[self.type], (self.position[0] + surface.get_size()[0] + 20, self.position[1]))
 
+
 class StatusLabel():
     def __init__(self, position, status):
         self.position = position
@@ -2050,13 +2767,6 @@ class StatusLabel():
         if self.status in Status.sprites:
             sprite = pygame.transform.scale_by(Status.sprites[self.status], 3)
             screen.blit(sprite, (self.position[0], self.position[1]))
-
-pygame.init()
-BUTTON_PRESSED = pygame.event.custom_type()
-screen = pygame.display.set_mode((1920, 1080))
-clock = pygame.time.Clock()
-font = pygame.font.SysFont("Calibri", 30)
-
 
 
 class ResolveParams:
@@ -2116,7 +2826,7 @@ class Game:
             Exeggutor(0), Cubone(0), Marowak(0), Hitmonlee(0), Hitmonchan(0), Lickitung(0),
             Koffing(0), Weezing(0), Rhyhorn(0), Rhydon(0), Chansey(0), Tangela(0),
             Kangaskhan(0), Horsea(0), Seadra(0), Goldeen(0), Seaking(0), Staryu(0),
-            Starmie(0), Mrmime(0), Scyther(0), Jynx(0), Electabuzz(0), Magmar(0),
+            Starmie(0), MrMime(0), Scyther(0), Jynx(0), Electabuzz(0), Magmar(0),
             Pinsir(0), Tauros(0), Magikarp(0), Gyarados(0), Lapras(0), Ditto(0),
             Eevee(0), Vaporeon(0), Jolteon(0), Flareon(0), Porygon(0), Omanyte(0),
             Omastar(0), Kabuto(0), Kabutops(0), Aerodactyl(0), Snorlax(0), Articuno(0),
@@ -2145,7 +2855,7 @@ class Game:
             Exeggutor(1), Cubone(1), Marowak(1), Hitmonlee(1), Hitmonchan(1), Lickitung(1),
             Koffing(1), Weezing(1), Rhyhorn(1), Rhydon(1), Chansey(1), Tangela(1),
             Kangaskhan(1), Horsea(1), Seadra(1), Goldeen(1), Seaking(1), Staryu(1),
-            Starmie(1), Mrmime(1), Scyther(1), Jynx(1), Electabuzz(1), Magmar(1),
+            Starmie(1), MrMime(1), Scyther(1), Jynx(1), Electabuzz(1), Magmar(1),
             Pinsir(1), Tauros(1), Magikarp(1), Gyarados(1), Lapras(1), Ditto(1),
             Eevee(1), Vaporeon(1), Jolteon(1), Flareon(1), Porygon(1), Omanyte(1),
             Omastar(1), Kabuto(1), Kabutops(1), Aerodactyl(1), Snorlax(1), Articuno(1),
@@ -2153,73 +2863,14 @@ class Game:
             Mew(1)
 ]
 
-        AllPokemonMoves = [
-            # Fire
-            WillOWisp(), Ember(), FireBlast(), FireSpin(), FirePunch(), Flamethrower(),
-            
-            # Electric
-            ThunderWave(), Thunderbolt(), ThunderShock(), ThunderPunch(), Thunder(),
-            
-            # Poison
-            Acid(), Toxic(), PoisonGas(), PoisonPowder(), Smog(), Sludge(), PosionSting(),
-            
-            # Water
-            WaterGun(), Waterfall(), Surf(), HydroPump(), Crabhammer(), Clamp(), Bubble(), BubbleBeam(),
-            
-            # Psychic
-            Psychic(), Confusion(), Hypnosis(), Psybeam(), Rest(),
-            
-            # Ice
-            PowderSnow(), Blizzard(), Haze(), IceBeam(), IcePunch(),
-            
-            # Ground
-            Earthquake(), Fissure(), BoneClub(), Bonemerang(), Dig(),
-            
-            # Flying
-            DrillPeck(), Fly(), Gust(), Peck(), SkyAttack(), WingAttack(),
-            
-            # Rock
-            RockSlide(), RockThrow(),
-            
-            # Ghost
-            Lick(), ConfuseRay(), NightShade(),
-            
-            # Dragon
-            DragonRage(),
-            
-            # Dark
-            Bite(),
-            
-            # Grass
-            Absorb(), MegaDrain(), RazorLeaf(), SleepPowder(), VineWhip(), PetalDance(), Spore(), StunSpore(), SolarBeam(),
-            
-            # Fighting
-            DoubleKick(), HighJumpKick(), JumpKick(), karateChop(), RollingKick(), SeismicToss(), Submission(),
-            
-            # Normal
-            Barrage(), Bind(), BodySlam(), Constrict(), Cut(), DizzyPunch(), DoubleSlap(), DoubleEdge(),
-            EggBomb(), Explosion(), FuryAttack(), FurySwipe(), Glare(), Guillotine(), Headbutt(),
-            HornAttack(), HornDrill(), HyperBeam(), HyperFang(), LovelyKiss(), MegaKick(), MegaPunch(),
-            PayDay(), Pound(), QuickAttack(), Rage(), RazorWind(), Recover(), Scratch(), SelfDestruct(),
-            Sing(), Slam(), Slash(), SoftBoiled(), SonicBoom(), SpikeCannon(), Stomp(), Strength(),
-            SuperFang(), Supersonic(), Swift(), Tackle(), TakeDown(), Thrash(), TriAttack(), ViseGrip(), Wrap(),
-            
-            # Bug
-            Twineedle(), PinMissile(), LeechLife()
-        ]
-
         for p1 in range(6):
             randPick = random.randint(0, 150)
             self.players[0].add_pokemon(AllP1Pokemon[randPick])
-            for move in range(4):
-                randMovePick = random.randint(0, 100)
-                self.players[0].pokemons[p1].moves.append(AllPokemonMoves[randMovePick])
+            self.players[0].pokemons[p1].generateMoveSet()
         for p2 in range(6):
             randPick = random.randint(0, 150)
             self.players[1].add_pokemon(AllP2Pokemon[randPick])
-            for move in range(4):
-                randMovePick = random.randint(0, 120)
-                self.players[1].pokemons[p2].moves.append(AllPokemonMoves[randMovePick])
+            self.players[1].pokemons[p2].generateMoveSet()
 
         # self.players[0].add_pokemon(Mewtwo(0))
         # self.players[0].add_pokemon(Mewtwo(0))
@@ -2366,7 +3017,6 @@ class Game:
             self.on_round_end(self.players[0].active_pokemon)
             self.on_round_end(self.players[1].active_pokemon)  
 
-
     def draw(self):
         pos2 = (125, 550)
         
@@ -2383,7 +3033,7 @@ class Game:
                 sprite = pygame.transform.scale_by(sprite, 4)
                 screen.blit(sprite, (130 + 400 * player.index, 180 - 160 * player.index)) # Draw Sprite
                 TypeLabel((600 - 480 * player.index, 400 - 300 * player.index), player.active_pokemon.name, player.active_pokemon.type).draw()
-                TypeLabel((700 - 480 * player.index, 400 - 300 * player.index), '', player.active_pokemon.type2).draw()
+                TypeLabel((800 - 450 * player.index, 400 - 300 * player.index), '', player.active_pokemon.type2).draw()
                 StatusLabel((550 - 520 * player.index, 445 - 300 * player.index), player.active_pokemon.status).draw()
                 self.health_bars[player.index].draw()
 
@@ -2443,7 +3093,6 @@ class Game:
         result = move1.use(p1, p2)
         self.resolve_params = ResolveParams(player1, player2, move1, move2, result)
 
-
     def resolve2(self):
         p1 = self.resolve_params.player1.active_pokemon
         p2 = self.resolve_params.player2.active_pokemon
@@ -2453,7 +3102,6 @@ class Game:
         else:
             self.resolve_params.result = Status.FAINTED
         
-
     def is_game_over(self, player):
         for i in range(len(player.pokemons)):
             if player.pokemons[i].current_health != 0:
@@ -2498,6 +3146,13 @@ class Game:
     @staticmethod  
     def set_text(text):
         Game.message_queue.append(text)  
+
+
+pygame.init()
+BUTTON_PRESSED = pygame.event.custom_type()
+screen = pygame.display.set_mode((1920, 1080))
+clock = pygame.time.Clock()
+font = pygame.font.SysFont("Calibri", 30)
 
 g = Game()
 g.start()
