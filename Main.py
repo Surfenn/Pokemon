@@ -56,7 +56,6 @@ class Player:
                 self.pokemons.append(self.AllPokemon[randomPick])
                 
 
-
 class Pokemon:
     def __init__(self, name, type, level, max_health, attack, defense, speed, sprite_path, index):
         self.name = name
@@ -253,6 +252,7 @@ class FlinchingMoves(StatusMove):
                 target.set_status(self.status)
         return result
 
+
 class MultiHitMoves(Move):
     def __init__(self, name, type, damage, accuracy, max_uses, hit_number):
         super().__init__(name, type, damage, max_uses)
@@ -284,6 +284,7 @@ class MultiHitMoves(Move):
         else:
             Game.set_text(user.name + " Missed")
             return Status.NONE
+
 
 class TwoTurnMove(Move):
     def __init__(self, name, type, damage, accuracy, max_uses, status = Status.COOLDOWN):
@@ -331,7 +332,8 @@ class AbsorptionMove(Move):
             return Status.NONE
         else:
             Game.set_text(user.name + " Missed")
-        
+
+
 class Switch(Move):
 
     def __init__(self):
@@ -402,7 +404,7 @@ class Type:
 
 #All Gen 1 Pokemon From https://pokemondb.net/pokedex/national
 # Generated consistent Pokémon class templates using ChatGPT
-
+# Created MoveList using https://pokemondb.net/pokedex/national and ChatGPT to repeat 151 times
 class Bulbasaur(Pokemon):
     def __init__(self, index):
         super().__init__("Bulbasaur", Type.GRASS, 50, 45, 49, 49, 45, "bulbasaur", index)
@@ -1758,9 +1760,10 @@ class Mewtwo(Pokemon):
             Confusion(), Psychic(), Swift(), Recover(),
             Rest(), HyperBeam(), Thunderbolt(), IceBeam(), Flamethrower()
         ]
-        self.moves.append(Toxic())
-        self.moves.append(Recover())
-        self.moves.append(Thunder())
+        # Used for Debugging
+        # self.moves.append(Toxic())
+        # self.moves.append(Recover())
+        # self.moves.append(SelfDestruct())
 
 class Mew(Pokemon):
     def __init__(self, index):
@@ -1770,8 +1773,9 @@ class Mew(Pokemon):
             Thunderbolt(), IceBeam(), Flamethrower(), Surf(),
             Strength(), Fly(), Rest(), HyperBeam()
         ]
-        self.moves.append(Dig())
-        self.moves.append(Sing())
+        # Used for Debugging
+        # self.moves.append(Dig())
+        # self.moves.append(Sing())
 
 #All Gen 1 Moves From https://pokemondb.net/move/generation/1
 ######################################################################################################################################################################
@@ -2454,7 +2458,7 @@ class Explosion(Move):
     
     def use(self, user, target):
         super().use(user, target)
-        user.current_health -= 10000000
+        user.current_health = 0
 
 class FuryAttack(MultiHitMoves):
     def __init__(self):
@@ -2550,7 +2554,7 @@ class SelfDestruct(Move):
     
     def use(self, user, target):
         super().use(user, target)
-        user.current_health -= 10000000
+        user.current_health = 0
 
 class Sing(StatusMove):
     def __init__(self):
