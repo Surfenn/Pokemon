@@ -43,6 +43,7 @@ class Pokemon:
         self.frozen_count = 0
         self.burn_count = None
         self.water_burn = 0
+        self.cooldown = 0
         if index == 0:
             self.sprite = pygame.image.load(os.path.join('Images', sprite_path + " back.png" ))
         elif index == 1:
@@ -59,7 +60,9 @@ class Pokemon:
     def generateMoveSet(self):
         while len(self.moves) <= 4:
             randomMove = random.randint(0, len(self.moveSet) - 1)
-            self.moves.append(self.moveSet[randomMove])
+            if self.moveSet[randomMove] not in self.moves:
+                self.moves.append(self.moveSet[randomMove])
+
 
     def display_moves(self):
         for i in range(len(self.moves)):
@@ -71,7 +74,7 @@ class Pokemon:
     def set_status(self, status):
         if status == self.status:
             return
-        if status == Status.SLEEP or status == Status.FROZEN:
+        if status == Status.SLEEP or status == Status.FROZEN or status == Status.BURN or status == Status.PARALYSIS or status == Status.POISON or status == Status.POISONEDBAD:
             if self.status == Status.FAINTED:
                 return
         elif status != Status.NONE and status != Status.FAINTED:
@@ -84,6 +87,8 @@ class Pokemon:
             self.frozen_count = 2
         elif self.status == Status.PARALYSIS:
             self.speed //= 2
+        elif self.status == Status.COOLDOWN:
+            self.cooldown = 1
 
 
 class Move:
@@ -101,7 +106,7 @@ class Move:
         return self.name + " (" + str(Type.names[self.type]) + ") " + str(self.current_uses) + "/" + str(self.max_uses)
     
     def use(self, user, target):
-        if(user.status == Status.SLEEP or user.status == Status.FROZEN or user.status == Status.FLINCH):
+        if(user.status == Status.SLEEP or user.status == Status.FROZEN or user.status == Status.FLINCH or user.status == Status.COOLDOWN):
             return self.check_status(user)
         elif(user.status == Status.PARALYSIS):
             if random.randint(1, 100) < 25:
@@ -143,13 +148,21 @@ class Move:
                 Game.set_text(user.name + " is Frozen")
                 user.frozen_count -= 1
                 return Status.FROZEN
+        elif(user.status == Status.COOLDOWN):
+            if(user.cooldown == 0):
+                user.set_status(Status.NONE)
+                Game.set_text(user.name + " is Done Recharging")
+            else:
+                Game.set_text(user.name + " is Recharging")
+                user.cooldown -= 1
+                return Status.COOLDOWN
         elif(user.status == Status.FLINCH):
             user.set_status(Status.NONE)
             Game.set_text(user.name + " Flinched")
             
 
 class Status:
-    names = ["","Switch", "Burned", "Asleep", "Fainted", "Frozen", "Paralysis", "Poisoned", "PoisonedBad", "Confused", "Flinched", "WaterBurn"]
+    names = ["","Switch", "Burned", "Asleep", "Fainted", "Frozen", "Paralysis", "Poisoned", "PoisonedBad", "Confused", "Flinched", "WaterBurn", "Cooldown"]
     NONE = 0
     SWITCHED = 1
     BURN = 2
@@ -162,7 +175,8 @@ class Status:
     CONFUSION = 9
     FLINCH = 10
     WATERBURN = 11
-    COUNT = 12
+    COOLDOWN = 12
+    COUNT = 13
     sprites = {}
     
     def get_status_path(status):
@@ -207,7 +221,6 @@ class FlinchingMoves(StatusMove):
                 target.set_status(self.status)
         return result
 
-
 class MultiHitMoves(Move):
     def __init__(self, name, type, damage, accuracy, max_uses, hit_number):
         super().__init__(name, type, damage, max_uses)
@@ -239,6 +252,18 @@ class MultiHitMoves(Move):
         else:
             Game.set_text(user.name + " Missed")
             return Status.NONE
+
+class TwoTurnMove(StatusMove):
+    def __init__(self, name, type, damage, accuracy, max_uses, status = Status.COOLDOWN):
+        super().__init__(name, type, damage, accuracy, max_uses, status)
+        
+    
+    def use(self, user, target):
+        result = super().use(user, target)
+        if result != Status.NONE:
+            return result
+        user.set_status(Status.COOLDOWN)
+        return result
 
 
 class AbsorptionMove(Move):
@@ -273,7 +298,6 @@ class AbsorptionMove(Move):
         else:
             Game.set_text(user.name + " Missed")
         
-
 class Switch(Move):
 
     def __init__(self):
@@ -442,14 +466,14 @@ class Caterpie(Pokemon):
     def __init__(self, index):
         super().__init__("Caterpie", Type.BUG, 50, 45, 30, 35, 45, "caterpie", index)
         self.moveSet = [
-            Tackle()
+            Tackle(), Cut(), Toxic(), BodySlam()
         ]
 
 class Metapod(Pokemon):
     def __init__(self, index):
         super().__init__("Metapod", Type.BUG, 50, 50, 20, 55, 30, "metapod", index)
         self.moveSet = [
-            Tackle()
+            Tackle(), Cut(), Toxic(), BodySlam()
         ]
 
 class Butterfree(Pokemon):
@@ -467,7 +491,7 @@ class Weedle(Pokemon):
         super().__init__("Weedle", Type.BUG, 50, 40, 35, 30, 50, "weedle", index)
         self.type2 = Type.POISON
         self.moveSet = [
-            Tackle(), PoisonSting()
+            Tackle(), PoisonSting(), PinMissile(), TakeDown()
         ]
 
 class Kakuna(Pokemon):
@@ -475,7 +499,7 @@ class Kakuna(Pokemon):
         super().__init__("Kakuna", Type.BUG, 50, 45, 25, 50, 35, "kakuna", index)
         self.type2 = Type.POISON
         self.moveSet = [
-            Tackle(), PoisonSting()
+            Tackle(), PoisonSting(), PinMissile(), TakeDown()
         ]
 
 class Beedrill(Pokemon):
@@ -930,7 +954,7 @@ class Abra(Pokemon):
     def __init__(self, index):
         super().__init__("Abra", Type.PSYCHIC, 50, 25, 20, 15, 90, "abra", index)
         self.moveSet = [
-            Rest()
+            Rest(), Hypnosis(), Sing(), Confusion()
         ]
 
 class Kadabra(Pokemon):
@@ -1515,7 +1539,7 @@ class Magikarp(Pokemon):
     def __init__(self, index):
         super().__init__("Magikarp", Type.WATER, 50, 20, 10, 55, 80, "magikarp", index)
         self.moveSet = [
-            Tackle()
+            Tackle(), BodySlam(), Stomp(), Rage()
         ]
 
 class Gyarados(Pokemon):
@@ -1541,7 +1565,7 @@ class Ditto(Pokemon):
     def __init__(self, index):
         super().__init__("Ditto", Type.NORMAL, 50, 48, 48, 48, 48, "ditto", index)
         self.moveSet = [
-            Tackle(), Rest()
+            Tackle(), Rest(), BodySlam(), Sing()
         ]
 
 class Eevee(Pokemon):
@@ -1699,6 +1723,9 @@ class Mewtwo(Pokemon):
             Confusion(), Psychic(), Swift(), Recover(),
             Rest(), HyperBeam(), Thunderbolt(), IceBeam(), Flamethrower()
         ]
+        self.moves.append(Toxic())
+        self.moves.append(Recover())
+        self.moves.append(Thunder())
 
 class Mew(Pokemon):
     def __init__(self, index):
@@ -1708,6 +1735,8 @@ class Mew(Pokemon):
             Thunderbolt(), IceBeam(), Flamethrower(), Surf(),
             Strength(), Fly(), Rest(), HyperBeam()
         ]
+        self.moves.append(Dig())
+        self.moves.append(Sing())
 
 #All Gen 1 Moves From https://pokemondb.net/move/generation/1
 ######################################################################################################################################################################
@@ -2052,9 +2081,9 @@ class Bonemerang(MultiHitMoves):
     def __init__(self):
         super().__init__("Bonemerang", Type.GROUND, 50, 90, 10, 2)
 
-class Dig(StatusMove): #TODO two turn attack
+class Dig(TwoTurnMove):
     def __init__(self):
-        super().__init__("Dig", Type.GROUND, 80, 100, 10, Status.NONE)
+        super().__init__("Dig", Type.GROUND, 80, 100, 10)
 ######################################################################################################################################################################
 
 #Flying moves
@@ -2062,9 +2091,9 @@ class DrillPeck(Move):
     def __init__(self):
         super().__init__("Drill Peck", Type.FLYING, 80, 20)
 
-class Fly(StatusMove): #TODO two turn attack
+class Fly(TwoTurnMove):
     def __init__(self):
-        super().__init__("Fly", Type.FLYING, 90, 95, 15, Status.NONE)
+        super().__init__("Fly", Type.FLYING, 90, 95, 15,)
 
 class Gust(Move):
     def __init__(self):
@@ -2074,9 +2103,9 @@ class Peck(Move):
     def __init__(self):
         super().__init__("Peck", Type.FLYING, 35, 35)
 
-class SkyAttack(StatusMove): #TODO two turn attack and has a chance to causes flinching
+class SkyAttack(TwoTurnMove):
     def __init__(self):
-        super().__init__("Sky Attack", Type.FLYING, 140, 90, 5, Status.NONE)
+        super().__init__("Sky Attack", Type.FLYING, 140, 90, 5)
 
 class WingAttack(Move):
     def __init__(self):
@@ -2178,11 +2207,10 @@ class StunSpore(StatusMove):
     def __init__(self):
         super().__init__("Stun Spore", Type.GRASS, 0, 75, 30, Status.PARALYSIS)
 
-class SolarBeam(StatusMove): #TODO two turn attack
+class SolarBeam(TwoTurnMove):
     def __init__(self):
-        super().__init__("Solar Beam", Type.GRASS, 120, 100, 10, Status.NONE)
+        super().__init__("Solar Beam", Type.GRASS, 120, 100, 10)
 
-#TODO create Leech Seed
 ######################################################################################################################################################################
 
 #Fighting Moves
@@ -2422,10 +2450,10 @@ class HornDrill(StatusMove):
     def __init__(self):
         super().__init__("Horn Drill", Type.NORMAL, 1000000000, 30, 5, Status.NONE)
 
-class HyperBeam(Move): #TODO needs to recharge for 1 round
+class HyperBeam(TwoTurnMove):
     def __init__(self):
         self.accuracy = 90
-        super().__init__("Hyper Beam", Type.NORMAL, 150, 5)
+        super().__init__("Hyper Beam", Type.NORMAL, 150, 100, 5)
 
 class HyperFang(FlinchingMoves):
     def __init__(self):
@@ -2462,16 +2490,20 @@ class Rage(Move):
     def __init__(self):
         super().__init__("Rage", Type.NORMAL, 20, 20)
 
-class RazorWind(Move):
-    def __init__(self): #TODO Charge up Attack
-        super().__init__("Razor Wind", Type.NORMAL, 80, 10)
+class RazorWind(TwoTurnMove):
+    def __init__(self):
+        super().__init__("Razor Wind", Type.NORMAL, 80, 100, 10)
 
 class Recover(StatusMove):
     def __init__(self):
         super().__init__("Recover", Type.NORMAL, 0, 100, 5, Status.NONE)
     
     def use(self, user, target):
-        user.current_health =+ user.max_health // 2
+        if user.current_health + user.max_health // 2 > user.max_health:
+            user.current_health = user.max_health
+        else:
+            user.current_health = user.current_health + user.max_health // 2
+        self.current_uses -= 1
 
 class Scratch(Move):
     def __init__(self):
@@ -2863,6 +2895,7 @@ class Game:
             Mew(1)
 ]
 
+        
         for p1 in range(6):
             randPick = random.randint(0, 150)
             self.players[0].add_pokemon(AllP1Pokemon[randPick])
@@ -2872,9 +2905,10 @@ class Game:
             self.players[1].add_pokemon(AllP2Pokemon[randPick])
             self.players[1].pokemons[p2].generateMoveSet()
 
+        # For Testing and Debuging
         # self.players[0].add_pokemon(Mewtwo(0))
-        # self.players[0].add_pokemon(Mewtwo(0))
-        # self.players[1].add_pokemon(Mew(1))
+        # self.players[1].add_pokemon(Mewtwo(1))
+        # self.players[0].add_pokemon(Mew(0))
         # self.players[1].add_pokemon(Mew(1))
         self.health_bars = [HealthBar((725, 450), None), HealthBar((225, 150), None)]
 
