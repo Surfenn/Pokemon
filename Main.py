@@ -1,7 +1,7 @@
 import os
 import pygame
 import random
-
+import math
 class Player:
 
     def __init__(self, name, index):
@@ -9,6 +9,34 @@ class Player:
         self.pokemons = []
         self.active_pokemon = None
         self.index = index
+        self.AllPokemon = [
+            Bulbasaur(self.index), Ivysaur(self.index), Venusaur(self.index), Charmander(self.index), Charmeleon(self.index), Charizard(self.index),
+            Squirtle(self.index), Wartortle(self.index), Blastoise(self.index), Caterpie(self.index), Metapod(self.index), Butterfree(self.index),
+            Weedle(self.index), Kakuna(self.index), Beedrill(self.index), Pidgey(self.index), Pidgeotto(self.index), Pidgeot(self.index),
+            Rattata(self.index), Raticate(self.index), Spearow(self.index), Fearow(self.index), Ekans(self.index), Arbok(self.index),
+            Pikachu(self.index), Raichu(self.index), Sandshrew(self.index), Sandslash(self.index), NidoranF(self.index), Nidorina(self.index),
+            Nidoqueen(self.index), NidoranM(self.index), Nidorino(self.index), Nidoking(self.index), Clefairy(self.index), Clefable(self.index),
+            Vulpix(self.index), Ninetales(self.index), Jigglypuff(self.index), Wigglytuff(self.index), Zubat(self.index), Golbat(self.index),
+            Oddish(self.index), Gloom(self.index), Vileplume(self.index), Paras(self.index), Parasect(self.index), Venonat(self.index),
+            Venomoth(self.index), Diglett(self.index), Dugtrio(self.index), Meowth(self.index), Persian(self.index), Psyduck(self.index),
+            Golduck(self.index), Mankey(self.index), Primeape(self.index), Growlithe(self.index), Arcanine(self.index), Poliwag(self.index),
+            Poliwhirl(self.index), Poliwrath(self.index), Abra(self.index), Kadabra(self.index), Alakazam(self.index), Machop(self.index),
+            Machoke(self.index), Machamp(self.index), Bellsprout(self.index), Weepinbell(self.index), Victreebel(self.index), Tentacool(self.index),
+            Tentacruel(self.index), Geodude(self.index), Graveler(self.index), Golem(self.index), Ponyta(self.index), Rapidash(self.index),
+            Slowpoke(self.index), Slowbro(self.index), Magnemite(self.index), Magneton(self.index), Farfetchd(self.index), Doduo(self.index),
+            Dodrio(self.index), Seel(self.index), Dewgong(self.index), Grimer(self.index), Muk(self.index), Shellder(self.index),
+            Cloyster(self.index), Gastly(self.index), Haunter(self.index), Gengar(self.index), Onix(self.index), Drowzee(self.index),
+            Hypno(self.index), Krabby(self.index), Kingler(self.index), Voltorb(self.index), Electrode(self.index), Exeggcute(self.index),
+            Exeggutor(self.index), Cubone(self.index), Marowak(self.index), Hitmonlee(self.index), Hitmonchan(self.index), Lickitung(self.index),
+            Koffing(self.index), Weezing(self.index), Rhyhorn(self.index), Rhydon(self.index), Chansey(self.index), Tangela(self.index),
+            Kangaskhan(self.index), Horsea(self.index), Seadra(self.index), Goldeen(self.index), Seaking(self.index), Staryu(self.index),
+            Starmie(self.index), MrMime(self.index), Scyther(self.index), Jynx(self.index), Electabuzz(self.index), Magmar(self.index),
+            Pinsir(self.index), Tauros(self.index), Magikarp(self.index), Gyarados(self.index), Lapras(self.index), Ditto(self.index),
+            Eevee(self.index), Vaporeon(self.index), Jolteon(self.index), Flareon(self.index), Porygon(self.index), Omanyte(self.index),
+            Omastar(self.index), Kabuto(self.index), Kabutops(self.index), Aerodactyl(self.index), Snorlax(self.index), Articuno(self.index),
+            Zapdos(self.index), Moltres(self.index), Dratini(self.index), Dragonair(self.index), Dragonite(self.index), Mewtwo(self.index),
+            Mew(self.index)
+        ]
     
     def display_team(self):
         for i in range(len(self.pokemons)):
@@ -19,10 +47,17 @@ class Player:
     
     def set_active_pokemon(self, pick):
         self.active_pokemon = pick
+    
+    def generate_Team(self):
+        while len(self.pokemons) != 6:
+            randomPick = random.randint(0, 150)
+            if self.AllPokemon[randomPick] not in self.pokemons:
+                self.AllPokemon[randomPick].generateMoveSet()
+                self.pokemons.append(self.AllPokemon[randomPick])
+                
 
 
 class Pokemon:
-
     def __init__(self, name, type, level, max_health, attack, defense, speed, sprite_path, index):
         self.name = name
         self.level = level
@@ -30,7 +65,7 @@ class Pokemon:
         self.type2 = Type.NONE
         self.iv = random.randint(0, 15)
         self.ev = random.randint(0, 255)
-        self.max_health = ((((max_health + self.iv) * 2 + (self.ev//4)) // 100) * level) + level + 10
+        self.max_health = math.floor((((max_health + self.iv) * 2 + math.floor((math.ceil(math.sqrt(self.ev)))/4)) * self.level)/100) + self.level + 10
         self.current_health = self.max_health
         self.attack = ((((attack + self.iv) * 2 + (self.ev//4)) // 100) * level) + 5
         self.defense = ((((defense + self.iv) * 2 + (self.ev//4)) // 100) * level) + 5
@@ -149,13 +184,10 @@ class Move:
                 user.frozen_count -= 1
                 return Status.FROZEN
         elif(user.status == Status.COOLDOWN):
-            if(user.cooldown == 0):
-                user.set_status(Status.NONE)
-                Game.set_text(user.name + " is Done Recharging")
-            else:
-                Game.set_text(user.name + " is Recharging")
-                user.cooldown -= 1
-                return Status.COOLDOWN
+            Game.set_text(user.name + " is Recharging")
+            user.cooldown -= 1
+            user.set_status(Status.NONE)
+            return Status.COOLDOWN
         elif(user.status == Status.FLINCH):
             user.set_status(Status.NONE)
             Game.set_text(user.name + " Flinched")
@@ -253,9 +285,11 @@ class MultiHitMoves(Move):
             Game.set_text(user.name + " Missed")
             return Status.NONE
 
-class TwoTurnMove(StatusMove):
+class TwoTurnMove(Move):
     def __init__(self, name, type, damage, accuracy, max_uses, status = Status.COOLDOWN):
-        super().__init__(name, type, damage, accuracy, max_uses, status)
+        super().__init__(name, type, damage, max_uses)
+        self.accuracy = accuracy
+        
         
     
     def use(self, user, target):
@@ -367,7 +401,8 @@ class Type:
 
 
 #All Gen 1 Pokemon From https://pokemondb.net/pokedex/national
-#All Gen 1 Pokemon From https://pokemondb.net/pokedex/national
+# Generated consistent Pokémon class templates using ChatGPT
+
 class Bulbasaur(Pokemon):
     def __init__(self, index):
         super().__init__("Bulbasaur", Type.GRASS, 50, 45, 49, 49, 45, "bulbasaur", index)
@@ -1848,7 +1883,7 @@ class ThunderPunch(StatusMove):
 
 class Thunder(StatusMove):
     def __init__(self):
-        super().__init__("Thunder Shock", Type.ELECTRIC, 110, 70, 10, Status.NONE)
+        super().__init__("Thunder", Type.ELECTRIC, 110, 70, 10, Status.NONE)
     
     def use(self, user, target):
         result = super().use(user, target)
@@ -2778,9 +2813,10 @@ class HealthBar():
 
 
 class TypeLabel():
-    def __init__(self, position, text, type):
+    def __init__(self, position, text, type, type2 = None):
         self.text = text
         self.type = type
+        self.type2 = type2
         self.position = position
 
     def draw(self):
@@ -2812,7 +2848,6 @@ class ResolveParams:
 
 
 class Game:
-
     PLAYER1_CHOOSE_POKEMON = 0
     PLAYER2_CHOOSE_POKEMON = 1
     PLAYER1_CHOOSE_MOVE = 2
@@ -2837,74 +2872,9 @@ class Game:
             Player("player1", 0),
             Player("player2", 1),        
         ]
-        AllP1Pokemon = [
-            Bulbasaur(0), Ivysaur(0), Venusaur(0), Charmander(0), Charmeleon(0), Charizard(0),
-            Squirtle(0), Wartortle(0), Blastoise(0), Caterpie(0), Metapod(0), Butterfree(0),
-            Weedle(0), Kakuna(0), Beedrill(0), Pidgey(0), Pidgeotto(0), Pidgeot(0),
-            Rattata(0), Raticate(0), Spearow(0), Fearow(0), Ekans(0), Arbok(0),
-            Pikachu(0), Raichu(0), Sandshrew(0), Sandslash(0), NidoranF(0), Nidorina(0),
-            Nidoqueen(0), NidoranM(0), Nidorino(0), Nidoking(0), Clefairy(0), Clefable(0),
-            Vulpix(0), Ninetales(0), Jigglypuff(0), Wigglytuff(0), Zubat(0), Golbat(0),
-            Oddish(0), Gloom(0), Vileplume(0), Paras(0), Parasect(0), Venonat(0),
-            Venomoth(0), Diglett(0), Dugtrio(0), Meowth(0), Persian(0), Psyduck(0),
-            Golduck(0), Mankey(0), Primeape(0), Growlithe(0), Arcanine(0), Poliwag(0),
-            Poliwhirl(0), Poliwrath(0), Abra(0), Kadabra(0), Alakazam(0), Machop(0),
-            Machoke(0), Machamp(0), Bellsprout(0), Weepinbell(0), Victreebel(0), Tentacool(0),
-            Tentacruel(0), Geodude(0), Graveler(0), Golem(0), Ponyta(0), Rapidash(0),
-            Slowpoke(0), Slowbro(0), Magnemite(0), Magneton(0), Farfetchd(0), Doduo(0),
-            Dodrio(0), Seel(0), Dewgong(0), Grimer(0), Muk(0), Shellder(0),
-            Cloyster(0), Gastly(0), Haunter(0), Gengar(0), Onix(0), Drowzee(0),
-            Hypno(0), Krabby(0), Kingler(0), Voltorb(0), Electrode(0), Exeggcute(0),
-            Exeggutor(0), Cubone(0), Marowak(0), Hitmonlee(0), Hitmonchan(0), Lickitung(0),
-            Koffing(0), Weezing(0), Rhyhorn(0), Rhydon(0), Chansey(0), Tangela(0),
-            Kangaskhan(0), Horsea(0), Seadra(0), Goldeen(0), Seaking(0), Staryu(0),
-            Starmie(0), MrMime(0), Scyther(0), Jynx(0), Electabuzz(0), Magmar(0),
-            Pinsir(0), Tauros(0), Magikarp(0), Gyarados(0), Lapras(0), Ditto(0),
-            Eevee(0), Vaporeon(0), Jolteon(0), Flareon(0), Porygon(0), Omanyte(0),
-            Omastar(0), Kabuto(0), Kabutops(0), Aerodactyl(0), Snorlax(0), Articuno(0),
-            Zapdos(0), Moltres(0), Dratini(0), Dragonair(0), Dragonite(0), Mewtwo(0),
-            Mew(0)
-        ]
-        
-        AllP2Pokemon = [
-            Bulbasaur(1), Ivysaur(1), Venusaur(1), Charmander(1), Charmeleon(1), Charizard(1),
-            Squirtle(1), Wartortle(1), Blastoise(1), Caterpie(1), Metapod(1), Butterfree(1),
-            Weedle(1), Kakuna(1), Beedrill(1), Pidgey(1), Pidgeotto(1), Pidgeot(1),
-            Rattata(1), Raticate(1), Spearow(1), Fearow(1), Ekans(1), Arbok(1),
-            Pikachu(1), Raichu(1), Sandshrew(1), Sandslash(1), NidoranF(1), Nidorina(1),
-            Nidoqueen(1), NidoranM(1), Nidorino(1), Nidoking(1), Clefairy(1), Clefable(1),
-            Vulpix(1), Ninetales(1), Jigglypuff(1), Wigglytuff(1), Zubat(1), Golbat(1),
-            Oddish(1), Gloom(1), Vileplume(1), Paras(1), Parasect(1), Venonat(1),
-            Venomoth(1), Diglett(1), Dugtrio(1), Meowth(1), Persian(1), Psyduck(1),
-            Golduck(1), Mankey(1), Primeape(1), Growlithe(1), Arcanine(1), Poliwag(1),
-            Poliwhirl(1), Poliwrath(1), Abra(1), Kadabra(1), Alakazam(1), Machop(1),
-            Machoke(1), Machamp(1), Bellsprout(1), Weepinbell(1), Victreebel(1), Tentacool(1),
-            Tentacruel(1), Geodude(1), Graveler(1), Golem(1), Ponyta(1), Rapidash(1),
-            Slowpoke(1), Slowbro(1), Magnemite(1), Magneton(1), Farfetchd(1), Doduo(1),
-            Dodrio(1), Seel(1), Dewgong(1), Grimer(1), Muk(1), Shellder(1),
-            Cloyster(1), Gastly(1), Haunter(1), Gengar(1), Onix(1), Drowzee(1),
-            Hypno(1), Krabby(1), Kingler(1), Voltorb(1), Electrode(1), Exeggcute(1),
-            Exeggutor(1), Cubone(1), Marowak(1), Hitmonlee(1), Hitmonchan(1), Lickitung(1),
-            Koffing(1), Weezing(1), Rhyhorn(1), Rhydon(1), Chansey(1), Tangela(1),
-            Kangaskhan(1), Horsea(1), Seadra(1), Goldeen(1), Seaking(1), Staryu(1),
-            Starmie(1), MrMime(1), Scyther(1), Jynx(1), Electabuzz(1), Magmar(1),
-            Pinsir(1), Tauros(1), Magikarp(1), Gyarados(1), Lapras(1), Ditto(1),
-            Eevee(1), Vaporeon(1), Jolteon(1), Flareon(1), Porygon(1), Omanyte(1),
-            Omastar(1), Kabuto(1), Kabutops(1), Aerodactyl(1), Snorlax(1), Articuno(1),
-            Zapdos(1), Moltres(1), Dratini(1), Dragonair(1), Dragonite(1), Mewtwo(1),
-            Mew(1)
-]
-
-        
-        for p1 in range(6):
-            randPick = random.randint(0, 150)
-            self.players[0].add_pokemon(AllP1Pokemon[randPick])
-            self.players[0].pokemons[p1].generateMoveSet()
-        for p2 in range(6):
-            randPick = random.randint(0, 150)
-            self.players[1].add_pokemon(AllP2Pokemon[randPick])
-            self.players[1].pokemons[p2].generateMoveSet()
-
+        for i in range(2):
+            self.players[i].generate_Team()
+    
         # For Testing and Debuging
         # self.players[0].add_pokemon(Mewtwo(0))
         # self.players[1].add_pokemon(Mewtwo(1))
@@ -3086,14 +3056,8 @@ class Game:
                 screen.blit(font.render(self.players[1].name + " Has Won The Game", True, pygame.Color(0, 0, 0)), pos2)
             elif self.is_game_over(self.players[1]):
                 screen.blit(font.render(self.players[0].name + " Has Won The Game", True, pygame.Color(0, 0, 0)), pos2)
-
-
         elif self.message_queue != []:
             screen.blit(font.render(self.message_queue[0], True, pygame.Color(0, 0, 0)), pos2)
-        
-
-            
-
         pygame.display.flip() # Draws Everything
 
     def choose_pokemon(self, player, index):
@@ -3184,7 +3148,7 @@ class Game:
 
 pygame.init()
 BUTTON_PRESSED = pygame.event.custom_type()
-screen = pygame.display.set_mode((1920, 1080))
+screen = pygame.display.set_mode((1500, 800))
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Calibri", 30)
 
