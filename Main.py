@@ -2760,15 +2760,13 @@ class PokemonButton(Button):
         super().__init__(position, PokemonButton.size, str(index))
         self.pokemon = pokemon
         self.health_bar = HealthBar((position[0] + 125, position[1] + 50), pokemon)
-        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), pokemon.name, pokemon.type)
-        self.type_label2 = TypeLabel((position[0] + Button.margin + 200, position[1] + Button.margin), '', pokemon.type2)
+        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), pokemon.name, pokemon.type, pokemon.type2)
         self.status_label = StatusLabel((position[0] + Button.margin + 400, position[1] + Button.margin), pokemon.status)
 
     def draw(self):
         pygame.draw.rect(screen, pygame.Color(200,200,255) if self.is_active else pygame.Color(100, 100, 100), pygame.Rect(self.position, PokemonButton.size))
         
         self.type_label.draw()
-        self.type_label2.draw()
         self.status_label.draw()
         self.health_bar.draw()
     
@@ -2786,7 +2784,7 @@ class MoveButton(Button):
     def __init__(self, position, move, index):
         super().__init__(position, MoveButton.size, str(index))
         self.move = move
-        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), move.name, move.type)
+        self.type_label = TypeLabel((position[0] + Button.margin, position[1] + Button.margin), move.name, move.type, None)
     
     def draw(self):
         pygame.draw.rect(screen, pygame.Color(200,200,255), pygame.Rect(self.position, MoveButton.size))
@@ -2813,7 +2811,7 @@ class HealthBar():
 
 
 class TypeLabel():
-    def __init__(self, position, text, type, type2 = None):
+    def __init__(self, position, text, type, type2):
         self.text = text
         self.type = type
         self.type2 = type2
@@ -2824,6 +2822,9 @@ class TypeLabel():
         screen.blit(surface, self.position)
         if self.type in Type.sprites:
             screen.blit(Type.sprites[self.type], (self.position[0] + surface.get_size()[0] + 20, self.position[1]))
+
+        if self.type2 != None and self.type2 in Type.sprites:
+            screen.blit(Type.sprites[self.type2], (self.position[0] + surface.get_size()[0] + 100, self.position[1]))
 
 
 class StatusLabel():
@@ -3036,8 +3037,7 @@ class Game:
                 sprite = player.active_pokemon.sprite
                 sprite = pygame.transform.scale_by(sprite, 4)
                 screen.blit(sprite, (130 + 400 * player.index, 180 - 160 * player.index)) # Draw Sprite
-                TypeLabel((600 - 480 * player.index, 400 - 300 * player.index), player.active_pokemon.name, player.active_pokemon.type).draw()
-                TypeLabel((800 - 450 * player.index, 400 - 300 * player.index), '', player.active_pokemon.type2).draw()
+                TypeLabel((600 - 480 * player.index, 400 - 300 * player.index), player.active_pokemon.name, player.active_pokemon.type, player.active_pokemon.type2).draw()
                 StatusLabel((550 - 520 * player.index, 445 - 300 * player.index), player.active_pokemon.status).draw()
                 self.health_bars[player.index].draw()
 
