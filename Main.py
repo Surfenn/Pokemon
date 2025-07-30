@@ -163,7 +163,7 @@ class Move:
         else:
             Game.set_text(user.name + " Missed")
             self.current_uses -= 1
-            return Status.NONE
+            return False
 
     def check_status(self, user):
         if(user.status == Status.SLEEP):
@@ -230,10 +230,11 @@ class StatusMove(Move):
 
     def use(self, user, target):
         result = super().use(user, target)
-        if result != Status.NONE:
+        if result != False:
+            if result != Status.NONE:
+                return result
+            target.set_status(self.status)
             return result
-        target.set_status(self.status)
-        return result
 
 
 class FlinchingMoves(StatusMove):
@@ -1774,7 +1775,7 @@ class Mew(Pokemon):
             Strength(), Fly(), Rest(), HyperBeam()
         ]
         # Used for Debugging
-        # self.moves.append(Dig())
+        # self.moves.append(Blizzard())
         # self.moves.append(Sing())
 
 #All Gen 1 Moves From https://pokemondb.net/move/generation/1
@@ -2032,6 +2033,7 @@ class Rest(StatusMove):
     def use(self, user, target):
         user.current_health = user.max_health
         user.set_status(Status.SLEEP)
+        self.current_uses -= 1
 ######################################################################################################################################################################      
 
 #Ice Moves
@@ -2885,6 +2887,7 @@ class Game:
         # self.players[1].add_pokemon(Mewtwo(1))
         # self.players[0].add_pokemon(Mew(0))
         # self.players[1].add_pokemon(Mew(1))
+        
         self.health_bars = [HealthBar((725, 450), None), HealthBar((225, 150), None)]
 
         self.player1_move = None
