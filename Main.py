@@ -405,7 +405,7 @@ class Type:
 
 #All Gen 1 Pokemon From https://pokemondb.net/pokedex/national
 # Generated consistent Pokémon class templates using ChatGPT
-# Created MoveList using https://pokemondb.net/pokedex/national and ChatGPT to repeat 151 times
+# Created MoveList using https://pokemondb.net/pokedex/national and asked ChatGPT to repeat 151 times
 class Bulbasaur(Pokemon):
     def __init__(self, index):
         super().__init__("Bulbasaur", Type.GRASS, 50, 45, 49, 49, 45, "bulbasaur", index)
@@ -1710,6 +1710,10 @@ class Articuno(Pokemon):
             Gust(), IceBeam(), Blizzard(),
             Peck(), Rest(), HyperBeam()
         ]
+        self.moves.append(Blizzard())
+        self.moves.append(Rest())
+        self.moves.append(Peck())
+        self.moves.append(Gust())
 
 class Zapdos(Pokemon):
     def __init__(self, index):
@@ -1728,6 +1732,10 @@ class Moltres(Pokemon):
             WingAttack(), FireSpin(), Flamethrower(),
             Peck(), Rest(), HyperBeam()
         ]
+        self.moves.append(WingAttack())
+        self.moves.append(Rest())
+        self.moves.append(Peck())
+        self.moves.append(Flamethrower())
 
 class Dratini(Pokemon):
     def __init__(self, index):
@@ -1762,9 +1770,10 @@ class Mewtwo(Pokemon):
             Rest(), HyperBeam(), Thunderbolt(), IceBeam(), Flamethrower()
         ]
         # Used for Debugging
-        # self.moves.append(Toxic())
-        # self.moves.append(Recover())
-        # self.moves.append(SelfDestruct())
+        self.moves.append(Psychic())
+        self.moves.append(Recover())
+        self.moves.append(Thunderbolt())
+        self.moves.append(Flamethrower())
 
 class Mew(Pokemon):
     def __init__(self, index):
@@ -1775,8 +1784,10 @@ class Mew(Pokemon):
             Strength(), Fly(), Rest(), HyperBeam()
         ]
         # Used for Debugging
-        # self.moves.append(Blizzard())
-        # self.moves.append(Sing())
+        self.moves.append(Thunderbolt())
+        self.moves.append(IceBeam())
+        self.moves.append(Surf())
+        self.moves.append(Pound())
 
 #All Gen 1 Moves From https://pokemondb.net/move/generation/1
 ######################################################################################################################################################################
@@ -2884,8 +2895,8 @@ class Game:
     
         # For Testing and Debuging
         # self.players[0].add_pokemon(Mewtwo(0))
-        # self.players[1].add_pokemon(Mewtwo(1))
-        # self.players[0].add_pokemon(Mew(0))
+        # self.players[1].add_pokemon(Moltres(1))
+        # self.players[0].add_pokemon(Articuno(0))
         # self.players[1].add_pokemon(Mew(1))
         
         self.health_bars = [HealthBar((725, 450), None), HealthBar((225, 150), None)]
@@ -2939,12 +2950,12 @@ class Game:
             
                 if self.state == Game.PLAYER1_CHOOSE_POKEMON:
                     self.choose_pokemon(self.players[0], int(event.dict['name']))
-
                     self.set_state()
+
                 elif self.state == Game.PLAYER2_CHOOSE_POKEMON:
                     self.choose_pokemon(self.players[1], int(event.dict['name']))
-                    
                     self.set_state()
+
                 elif self.state == Game.PLAYER1_CHOOSE_MOVE:
                     self.player1_move = self.choose_move(self.players[0], int(event.dict['name']))
                     self.set_state()
@@ -3036,7 +3047,7 @@ class Game:
         image = pygame.image.load(os.path.join('UI', "PBC.PNG"))
         image = pygame.transform.scale_by(image, 3.5)
         screen.blit(image, (52, 0))
-        for button in self.buttons[self.state]: #TODO Add Status to pokemon button
+        for button in self.buttons[self.state]:
             button.draw()
 
         for player in self.players:
